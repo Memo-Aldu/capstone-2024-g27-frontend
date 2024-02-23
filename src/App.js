@@ -1,23 +1,18 @@
-import logo from './logo.svg';
 import './App.css';
-
+import QuickSMS from './QuickSMS'
 function App() {
+
+  const sendSMS = (recipient, message) => {
+    // Your SMS sending logic here, using an API or a library
+    console.log(`Sending SMS to ${recipient}: ${message}`);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="App">
+      <QuickSMS onSendSMS={sendSMS} />
+      {/* Add other features like SMS Campaign, Templates, Email to SMS, and History */}
+      </div>
     </div>
   );
 }
