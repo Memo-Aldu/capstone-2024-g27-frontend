@@ -15,29 +15,22 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
+import { useNavigate } from 'react-router-dom'
 
 const drawerWidth = 200
 
-const drawerIcons = {
-  Home: <HomeIcon />,
-  'Contact Management': <ContactMailIcon />,
-  Messaging: <MessageIcon />,
-  Help: <HelpIcon />,
-  'My Account': <AccountCircleIcon />
-}
-
-const DrawerIcons = ({ iconNames }) => {
-  return iconNames.map((iconName) => (
-    <ListItem key={iconName} disablePadding>
-      <ListItemButton>
-        <ListItemIcon>{drawerIcons[iconName]}</ListItemIcon>
-        <ListItemText primary={iconName} />
-      </ListItemButton>
-    </ListItem>
-  ))
-}
-
 export default function Layout (props) {
+  const navigate = useNavigate()
+  const menuItems1 = [
+    { name: 'Home', path: '/', icon: <HomeIcon /> },
+    { name: 'Contact Management', path: '/contact-management', icon: <ContactMailIcon /> },
+    { name: 'Messaging', path: '/messaging', icon: <MessageIcon /> }
+  ]
+  const menuItems2 = [
+    { name: 'Help', path: '/help', icon: <HelpIcon /> },
+    { name: 'My Account', path: '/my-account', icon: <AccountCircleIcon /> }
+  ]
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
@@ -60,11 +53,23 @@ export default function Layout (props) {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            <DrawerIcons iconNames={['Home', 'Contact Management', 'Messaging']} />
+            {menuItems1.map((item) => (
+              <ListItem key={item.name} disablePadding>
+                <ListItemButton onClick={() => navigate(item.path)}>
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.name} />
+                </ListItemButton>
+              </ListItem>))}
           </List>
           <Divider />
           <List>
-            <DrawerIcons iconNames={['Help', 'My Account']} />
+            {menuItems2.map((item) => (
+              <ListItem key={item.name} disablePadding>
+                <ListItemButton onClick={() => navigate(item.path)}>
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.name} />
+                </ListItemButton>
+              </ListItem>))}
           </List>
         </Box>
       </Drawer>
