@@ -19,7 +19,7 @@ import { useNavigate } from 'react-router-dom'
 
 const drawerWidth = 200
 
-export default function Layout (props) {
+export default function Layout (props: { children: React.ReactNode }) {
   const navigate = useNavigate()
   const menuItems1 = [
     { name: 'Home', path: '/', icon: <HomeIcon /> },
