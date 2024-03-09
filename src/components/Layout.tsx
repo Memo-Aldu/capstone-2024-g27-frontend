@@ -19,7 +19,7 @@ import { useNavigate } from 'react-router-dom'
 
 const drawerWidth = 200
 
-export default function Layout (props: { children: React.ReactNode }) {
+export default function Layout (props: { children: React.ReactNode }): JSX.Element {
   const navigate = useNavigate()
   const menuItems1 = [
     { name: 'Home', path: '/', icon: <HomeIcon /> },
@@ -55,7 +55,7 @@ export default function Layout (props: { children: React.ReactNode }) {
           <List>
             {menuItems1.map((item) => (
               <ListItem key={item.name} disablePadding>
-                <ListItemButton onClick={() => navigate(item.path)}>
+                <ListItemButton onClick={() => { navigate(item.path) }}>
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText primary={item.name} />
                 </ListItemButton>
@@ -65,7 +65,7 @@ export default function Layout (props: { children: React.ReactNode }) {
           <List>
             {menuItems2.map((item) => (
               <ListItem key={item.name} disablePadding>
-                <ListItemButton onClick={() => navigate(item.path)}>
+                <ListItemButton onClick={() => { navigate(item.path) }}>
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText primary={item.name} />
                 </ListItemButton>
