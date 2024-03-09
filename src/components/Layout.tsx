@@ -73,7 +73,7 @@ export default function Layout (props: { children: React.ReactNode }): JSX.Eleme
           </List>
         </Box>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box component="main">
         <Toolbar />
         {props.children}
       </Box>
