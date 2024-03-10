@@ -16,6 +16,7 @@ import ListItemText from '@mui/material/ListItemText'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import { useNavigate } from 'react-router-dom'
+import { Avatar } from '@mui/material'
 
 const drawerWidth = 200
 
@@ -39,6 +40,7 @@ export default function Layout (props: { children: React.ReactNode }) {
           <Typography variant="h6" noWrap component="div">
             Pharmfinder
           </Typography>
+          
         </Toolbar>
       </AppBar>
       <Drawer
