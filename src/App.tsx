@@ -8,6 +8,9 @@ import Campaign from './pages/Messaging/Campaign'
 import Templates from './pages/Messaging/Templates'
 import EmailToSMS from './pages/Messaging/EmailToSMS'
 import History from './pages/Messaging/History'
+import ContactManagementLayout from './pages/ContactManagement/ContactManagementLayout'
+import Contacts from './pages/ContactManagement/Contacts'
+import Groupes from './pages/ContactManagement/Groupes'
 
 function App (): JSX.Element {
   return (
@@ -21,6 +24,11 @@ function App (): JSX.Element {
           <Route path="/messaging/templates" element={<Templates/>} />
           <Route path="/messaging/emailToSMS" element={<EmailToSMS/>} />
           <Route path="/messaging/history" element={<History/>} />
+          <Route path="/contact-management" element={<ContactManagementLayout />} />
+          <Route path="/ContactManagement/contacts" element={<Contacts />} />
+          <Route path="/ContactManagement/groupes" element={<Groupes />} />
+
+
         </Routes>
       </Layout>
     </Router>
