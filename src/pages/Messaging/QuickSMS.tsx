@@ -6,7 +6,7 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import MessagingLayout from './MessagingLayout'
+import MessagingLayout from '../../components/MessagingLayout'
 import { DateTimePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'

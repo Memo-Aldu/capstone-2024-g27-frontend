@@ -1,5 +1,5 @@
 import { Typography } from '@mui/material'
-import MessagingLayout from './MessagingLayout'
+import MessagingLayout from '../../components/MessagingLayout'
 
 function History (): JSX.Element {
   return (
