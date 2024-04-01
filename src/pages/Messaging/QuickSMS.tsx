@@ -6,12 +6,16 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import MessagingLayout from '../../components/MessagingLayout'
 import { DateTimePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import { useState } from 'react'
 import dayjs from 'dayjs'
+import { useState } from 'react'
+import MessagingLayout from '../../components/MessagingLayout'
+import { useScheduleBulkSMSMutation, useScheduleSMSMutation, useSendBulkSMSMutation, useSendSMSMutation } from '../../features/sms/SmsApiSlice'
+import { type BaseSMSRequest } from '../../types/SMSRequest.types'
+import { type AnySMSResponse } from '../../types/SMSResponse.type'
+import { validatePhoneNumber } from '../../features/sms/SmsHelper'
 
 interface FormErrors {
   toError: string
@@ -36,6 +40,11 @@ function QuickSMS (): JSX.Element {
     bulkError: ''
   })
 
+  const [sendSMS] = useSendSMSMutation()
+  const [scheduleSMS] = useScheduleSMSMutation()
+  const [sendBulkSMS] = useSendBulkSMSMutation()
+  const [scheduleBulkSMS] = useScheduleBulkSMSMutation()
+
   const handleAddRecipient = (): void => {
     if (to === '') {
       setErrors((prevErrors) => ({
@@ -43,12 +52,18 @@ function QuickSMS (): JSX.Element {
         toError: 'Recipient cannot be empty'
       }))
       return
+    } else if (validatePhoneNumber(to)) {
+      setRecipients((prevRecipients) => [...prevRecipients, to])
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        toError: 'Invalid Phone Number'
+      }))
     }
-    setRecipients((prevRecipients) => [...prevRecipients, to])
     setTo('')
   }
 
-  const validateSMSRequest = (): void => {
+  const validateSMSRequest = (): boolean => {
     const newErrors: FormErrors = {
       toError: '',
       fromError: '',
@@ -56,20 +71,23 @@ function QuickSMS (): JSX.Element {
       scheduleError: '',
       bulkError: ''
     }
-    if (recipients.length === 0) {
-      if (to !== '') {
-        // Check if there is a recipient in the input field
-        handleAddRecipient()
-      } else {
-        newErrors.toError = 'At least one recipient is required'
-      }
+    if (to !== '') {
+      // Check if there is a recipient in the input field
+      handleAddRecipient()
+    } else if (recipients.length === 0) {
+      newErrors.toError = 'At least one recipient is required'
     }
+
     if (sender === '') {
       newErrors.fromError = 'Sender cannot be empty'
+    } else if (!validatePhoneNumber(sender)) {
+      newErrors.fromError = 'Invalid Phone Number'
     }
+
     if (messageContent === '') {
       newErrors.messageError = 'Message cannot be empty'
     }
+
     if (scheduled && scheduleTime == null) {
       newErrors.scheduleError = 'Scheduled time is required'
     } else if (scheduleTime != null) {
@@ -84,21 +102,79 @@ function QuickSMS (): JSX.Element {
       }
     }
     setErrors(newErrors)
+    if (Object.values(newErrors).every((error) => error === '')) {
+      return true
+    } else {
+      return false
+    }
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
-    validateSMSRequest()
-    const smsRequest = {
-      recipients: recipients.join(', '),
+    const valid = validateSMSRequest()
+    // eslint-disable-next-line no-console
+    console.log({
+      recipients,
       sender,
       messageContent,
+      scheduled,
       scheduleTime
+    })
+    if (valid) {
+      handleSmsRequest({ recipients, sender, messageContent, scheduled, scheduleTime }).then((response) => {
+        // eslint-disable-next-line no-console
+        console.log(response)
+      }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error(error)
+      })
     }
-
-    // eslint-disable-next-line no-console
-    console.log(smsRequest)
   }
+
+  const handleSmsRequest = async (request: BaseSMSRequest): Promise<AnySMSResponse> => {
+    const { recipients, sender, messageContent, scheduled, scheduleTime } = request
+    const bulk = recipients.length > 1
+    let result: AnySMSResponse
+    if (scheduled) {
+    // Send Scheduled SMS
+      if (bulk) {
+      // Send Bulk Scheduled SMS
+        result = await scheduleBulkSMS({
+          recipients,
+          sender,
+          content: messageContent,
+          scheduleTime
+        }).unwrap()
+      } else {
+      // Send Scheduled SMS
+        result = await scheduleSMS({
+          recipient: recipients[0],
+          sender,
+          content: messageContent,
+          scheduleTime
+        }).unwrap()
+      }
+    } else {
+    // Send Immediate SMS
+      if (bulk) {
+      // Send Bulk Immediate SMS
+        result = await sendBulkSMS({
+          recipients,
+          sender,
+          content: messageContent
+        }).unwrap()
+      } else {
+      // Send Immediate SMS
+        result = await sendSMS({
+          recipient: recipients[0],
+          sender,
+          content: messageContent
+        }).unwrap()
+      }
+    }
+    return result
+  }
+
   return (
     <MessagingLayout>
       <Typography variant="h4" component="h1" gutterBottom>
