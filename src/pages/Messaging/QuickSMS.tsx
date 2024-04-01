@@ -11,7 +11,6 @@ import { DateTimePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { useState } from 'react'
-import { type SMSRequest } from '../../types/SMSRequest.types'
 import dayjs from 'dayjs'
 
 interface FormErrors {
@@ -90,7 +89,7 @@ function QuickSMS (): JSX.Element {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
     validateSMSRequest()
-    const smsRequest: SMSRequest = {
+    const smsRequest = {
       recipients: recipients.join(', '),
       sender,
       messageContent,
