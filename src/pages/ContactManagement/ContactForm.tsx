@@ -1,17 +1,22 @@
 import React, { FC, useState } from 'react';
 import { Button, TextField, Box, Typography } from '@mui/material';
-import { Action } from './ContactReducer';
+import { Action, IContact } from './ContactReducer';
 
 
-interface ContactFormProps {dispatch: React.Dispatch<Action>;onClose: () => void;}
+interface ContactFormProps {
+  dispatch: React.Dispatch<Action>;
+  onClose: () => void;
+}
 
 const ContactForm: FC<ContactFormProps> = ({ dispatch, onClose }) => {
+  //dispatch, onClose
 
   const [contact, setContact] = useState({
+    
     firstName: '',
     lastName: '',
     phone: '',
-    email:'',
+    email: ''
   });
   
 
@@ -26,6 +31,7 @@ const ContactForm: FC<ContactFormProps> = ({ dispatch, onClose }) => {
 
   const handleOnSubmit = (event: React.FormEvent<HTMLFormElement>) => {
   event.preventDefault();
+  
   dispatch({
     type: 'ADD_CONTACT',
     payload: {
@@ -33,7 +39,7 @@ const ContactForm: FC<ContactFormProps> = ({ dispatch, onClose }) => {
     ...contact
     }
   });
-  onClose(); // Close the form
+  onClose(); 
 };
 
   return (
@@ -93,9 +99,10 @@ const ContactForm: FC<ContactFormProps> = ({ dispatch, onClose }) => {
             
           />
           
-          <Button variant="contained" type="submit" color="primary" sx={{ mt: 2 }}>
-            Add
-          </Button>  
+          
+          <Button variant='contained' type='submit' className='submit-btn'>
+            Add Contact
+          </Button>
       </Box>
     </Box>
     </>

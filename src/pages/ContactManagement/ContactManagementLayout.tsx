@@ -10,6 +10,7 @@ import { Box } from '@mui/system'
 import { useNavigate } from 'react-router-dom'
 import Contact from '@mui/icons-material/Contacts';
 
+
 function ContactManagementLayout (props: { children?: React.ReactNode }): JSX.Element {
   const navigate = useNavigate()
   const drawerWidth = 200
