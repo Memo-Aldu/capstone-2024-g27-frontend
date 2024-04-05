@@ -45,25 +45,23 @@ function QuickSMS (): JSX.Element {
   const [sendBulkSMS] = useSendBulkSMSMutation()
   const [scheduleBulkSMS] = useScheduleBulkSMSMutation()
 
-  const handleAddRecipient = (): void => {
+  const handleAddRecipient = (): { newToError: string, newRecipients: string[] } => {
+    const newRecipients = [...recipients]
+    let newToError = ''
     if (to === '') {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        toError: 'Recipient cannot be empty'
-      }))
-      return
+      newToError = 'Recipient cannot be empty'
     } else if (validatePhoneNumber(to)) {
-      setRecipients((prevRecipients) => [...prevRecipients, to])
+      newRecipients.push(to)
+      setTo('')
     } else {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        toError: 'Invalid Phone Number'
-      }))
+      newToError = 'Invalid Phone Number'
     }
-    setTo('')
+    setRecipients(newRecipients)
+    setErrors({ ...errors, toError: newToError })
+    return { newToError, newRecipients }
   }
 
-  const validateSMSRequest = (): boolean => {
+  const validateSMSRequest = (): BaseSMSRequest | undefined => {
     const newErrors: FormErrors = {
       toError: '',
       fromError: '',
@@ -71,9 +69,11 @@ function QuickSMS (): JSX.Element {
       scheduleError: '',
       bulkError: ''
     }
+    let currentRecipients = recipients
+    let newToError = ''
     if (to !== '') {
-      // Check if there is a recipient in the input field
-      handleAddRecipient()
+      ({ newToError, newRecipients: currentRecipients } = handleAddRecipient())
+      newErrors.toError = newToError
     } else if (recipients.length === 0) {
       newErrors.toError = 'At least one recipient is required'
     }
@@ -103,31 +103,32 @@ function QuickSMS (): JSX.Element {
     }
     setErrors(newErrors)
     if (Object.values(newErrors).every((error) => error === '')) {
-      return true
-    } else {
-      return false
+      return {
+        recipients: currentRecipients,
+        sender,
+        messageContent,
+        scheduled,
+        scheduleTime
+      }
     }
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
-    const valid = validateSMSRequest()
+    const smsRequest = validateSMSRequest()
     // eslint-disable-next-line no-console
-    console.log({
-      recipients,
-      sender,
-      messageContent,
-      scheduled,
-      scheduleTime
-    })
-    if (valid) {
-      handleSmsRequest({ recipients, sender, messageContent, scheduled, scheduleTime }).then((response) => {
+    console.log(smsRequest)
+    if (smsRequest !== undefined) {
+      handleSmsRequest(smsRequest).then((response) => {
         // eslint-disable-next-line no-console
         console.log(response)
       }).catch((error) => {
         // eslint-disable-next-line no-console
         console.error(error)
       })
+    } else {
+      // eslint-disable-next-line no-console
+      console.error('Invalid SMS Request')
     }
   }
 

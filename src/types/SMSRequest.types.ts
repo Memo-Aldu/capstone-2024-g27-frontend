@@ -4,7 +4,6 @@ export interface BaseSMSRequest {
   messageContent: string
   scheduled: boolean
   scheduleTime: Date | null
-
 }
 
 export interface SMSSendRequest {
