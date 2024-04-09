@@ -1,64 +1,60 @@
-import React, { FC, useState } from 'react';
-import { Button, TextField, Box, Typography } from '@mui/material';
-import { Action, IContact } from './ContactReducer';
-
+import React, { type FC, useState } from 'react'
+import { Button, TextField, Box, Typography } from '@mui/material'
+import { type Action, IContact } from './ContactReducer'
 
 interface ContactFormProps {
-  dispatch: React.Dispatch<Action>;
-  onClose: () => void;
+  dispatch: React.Dispatch<Action>
+  onClose: () => void
 }
 
 const ContactForm: FC<ContactFormProps> = ({ dispatch, onClose }) => {
-  //dispatch, onClose
+  // dispatch, onClose
 
   const [contact, setContact] = useState({
-    
+
     firstName: '',
     lastName: '',
     phone: '',
     email: ''
-  });
-  
+  })
 
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    
+    const { name, value } = event.target
+
     setContact((prevState) => ({
       ...prevState,
-      [name]: value,
-    }));
-  };
+      [name]: value
+    }))
+  }
 
   const handleOnSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-  event.preventDefault();
-  
-  dispatch({
-    type: 'ADD_CONTACT',
-    payload: {
-      id: Date.now(), // returns current timestamp
-    ...contact
-    }
-  });
-  onClose(); 
-};
+    event.preventDefault()
+
+    dispatch({
+      type: 'ADD_CONTACT',
+      payload: {
+        id: Date.now(), // returns current timestamp
+        ...contact
+      }
+    })
+    onClose()
+  }
 
   return (
 
     <>
 
-    
-
     <Box
       sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+
       }}
     >
       <Box component={'form'}
         onSubmit={handleOnSubmit}
-        sx={{ maxWidth: 600, mx: "auto", p: 2 }}>
+        sx={{ maxWidth: 600, mx: 'auto', p: 2 }}>
 
         <Typography variant="h4" align="center" mb={2}>
           Add a contact
@@ -71,7 +67,7 @@ const ContactForm: FC<ContactFormProps> = ({ dispatch, onClose }) => {
             onChange={handleOnChange}
             margin="normal"
             name="firstName"
-            
+
           />
           <TextField
             fullWidth
@@ -96,17 +92,16 @@ const ContactForm: FC<ContactFormProps> = ({ dispatch, onClose }) => {
             onChange={handleOnChange}
             margin="normal"
             name = "phone"
-            
+
           />
-          
-          
+
           <Button variant='contained' type='submit' className='submit-btn'>
             Add Contact
           </Button>
       </Box>
     </Box>
     </>
-  );
-};
+  )
+}
 
-export default ContactForm;
+export default ContactForm

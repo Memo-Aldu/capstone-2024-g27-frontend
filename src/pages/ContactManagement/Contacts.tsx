@@ -1,17 +1,15 @@
 import { Box, Button, Grid, Typography } from '@mui/material'
 import ContactManagementLayout from './ContactManagementLayout'
-import { useEffect, useState } from 'react';
-import ContactForm from './ContactForm';
-import { contactsReducer, IContact,State } from './ContactReducer';
-import { useReducer } from 'react';
-import ContactList from './ContactList';
-import * as React from 'react';
-import Backdrop from '@mui/material/Backdrop';
-import Modal from '@mui/material/Modal';
-import Fade from '@mui/material/Fade';
-import GroupAddIcon from '@mui/icons-material/GroupAdd';
-import AddIcon from '@mui/icons-material/Add';
-
+import { useEffect, useState, useReducer } from 'react'
+import ContactForm from './ContactForm'
+import { contactsReducer, IContact, type State } from './ContactReducer'
+import ContactList from './ContactList'
+import * as React from 'react'
+import Backdrop from '@mui/material/Backdrop'
+import Modal from '@mui/material/Modal'
+import Fade from '@mui/material/Fade'
+import GroupAddIcon from '@mui/icons-material/GroupAdd'
+import AddIcon from '@mui/icons-material/Add'
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -22,13 +20,13 @@ const style = {
   bgcolor: 'background.paper',
   border: '2px solid #000',
   boxShadow: 24,
-  p: 4,
-};
+  p: 4
+}
 
-export function TransitionsModal() {
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+export function TransitionsModal () {
+  const [open, setOpen] = React.useState(false)
+  const handleOpen = () => { setOpen(true) }
+  const handleClose = () => { setOpen(false) }
 
   return (
     <div>
@@ -42,8 +40,8 @@ export function TransitionsModal() {
         slots={{ backdrop: Backdrop }}
         slotProps={{
           backdrop: {
-            timeout: 500,
-          },
+            timeout: 500
+          }
         }}
       >
         <Fade in={open}>
@@ -58,52 +56,50 @@ export function TransitionsModal() {
         </Fade>
       </Modal>
     </div>
-  );
+  )
 }
-
 
 const initialState: State = {
   contacts: []
-};
+}
 function Contacts (): JSX.Element {
-  const [state, dispatch] = useReducer(contactsReducer, initialState);
-  const [showModal, setShowModal] = useState(false);
+  const [state, dispatch] = useReducer(contactsReducer, initialState)
+  const [showModal, setShowModal] = useState(false)
 
   const onClose = () => {
-    setShowModal((show) => !show);
-  };
+    setShowModal((show) => !show)
+  }
 
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  
+  const [open, setOpen] = React.useState(false)
+  const handleOpen = () => { setOpen(true) }
+  const handleClose = () => { setOpen(false) }
 
   return (
-    
+
       <ContactManagementLayout>
         <Grid container spacing={2}>
           <Grid item xs={8}>
               <Typography variant="h4" component="h1" gutterBottom>
               Contact list
               </Typography>
-      
+
           </Grid>
-          <Grid item xs={4} style={{ display: "flex", justifyContent: "flex-end" }}>
+          <Grid item xs={4} style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button onClick={handleOpen} >
-              {/*icone d'ajout de person*/}
+              {/* icone d'ajout de person */}
               <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
               </Button>
           </Grid>
           <Grid item xs={12}>
             {/* Affichage du formulaire de contact uniquement si la popup est ouverte */}
-            
+
           </Grid>
           <Grid item xs={12}>
-          {(<ContactList contacts={state.contacts} dispatch={dispatch}/>)}     
+          {(<ContactList contacts={state.contacts} dispatch={dispatch}/>)}
           </Grid>
-        </Grid> 
+        </Grid>
 
-        {/*Ceci est une fenetre modal*/}
+        {/* Ceci est une fenetre modal */}
         <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
@@ -113,8 +109,8 @@ function Contacts (): JSX.Element {
         slots={{ backdrop: Backdrop }}
         slotProps={{
           backdrop: {
-            timeout: 500,
-          },
+            timeout: 500
+          }
         }}
       >
         <Fade in={open}>
@@ -123,7 +119,7 @@ function Contacts (): JSX.Element {
           </Box>
         </Fade>
       </Modal>
-          
+
       </ContactManagementLayout>
 
   )

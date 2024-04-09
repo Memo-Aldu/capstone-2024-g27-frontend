@@ -28,7 +28,6 @@ function App (): JSX.Element {
           <Route path="/ContactManagement/contacts" element={<Contacts />} />
           <Route path="/ContactManagement/groupes" element={<Groupes />} />
 
-
         </Routes>
       </Layout>
     </Router>

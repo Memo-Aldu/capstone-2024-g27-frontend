@@ -1,62 +1,60 @@
-import { FC } from 'react';
-import { IContact, Action} from './ContactReducer';
-import { alpha } from '@mui/material/styles';
-import { useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableFooter from '@mui/material/TableFooter';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import IconButton from '@mui/material/IconButton';
-import FirstPageIcon from '@mui/icons-material/FirstPage';
-import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
-import LastPageIcon from '@mui/icons-material/LastPage';
-import { TableHead } from '@mui/material';
-import React from 'react';
-import { AiFillDelete, AiFillEdit } from 'react-icons/ai';
+import React, { type FC } from 'react'
+import { type IContact, type Action } from './ContactReducer'
+import { alpha, useTheme } from '@mui/material/styles'
+import Box from '@mui/material/Box'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import TableFooter from '@mui/material/TableFooter'
+import TablePagination from '@mui/material/TablePagination'
+import TableRow from '@mui/material/TableRow'
+import Paper from '@mui/material/Paper'
+import IconButton from '@mui/material/IconButton'
+import FirstPageIcon from '@mui/icons-material/FirstPage'
+import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
+import LastPageIcon from '@mui/icons-material/LastPage'
+import { TableHead } from '@mui/material'
+import { AiFillDelete, AiFillEdit } from 'react-icons/ai'
 
 interface ContactListProps {
-  contacts: IContact[];
-  dispatch: React.Dispatch<Action>;
+  contacts: IContact[]
+  dispatch: React.Dispatch<Action>
 }
 
 interface TablePaginationActionsProps {
-  count: number;
-  page: number;
-  rowsPerPage: number;
+  count: number
+  page: number
+  rowsPerPage: number
   onPageChange: (
     event: React.MouseEvent<HTMLButtonElement>,
     newPage: number,
-  ) => void;
+  ) => void
 }
 
-//fonction pour s'occuper de la pagination
-function TablePaginationActions(props: TablePaginationActionsProps) {
-  const theme = useTheme();
-  const { count, page, rowsPerPage, onPageChange } = props;
+// fonction pour s'occuper de la pagination
+function TablePaginationActions (props: TablePaginationActionsProps) {
+  const theme = useTheme()
+  const { count, page, rowsPerPage, onPageChange } = props
 
   const handleFirstPageButtonClick = (
-    event: React.MouseEvent<HTMLButtonElement>,
+    event: React.MouseEvent<HTMLButtonElement>
   ) => {
-    onPageChange(event, 0);
-  };
+    onPageChange(event, 0)
+  }
 
   const handleBackButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onPageChange(event, page - 1);
-  };
+    onPageChange(event, page - 1)
+  }
 
   const handleNextButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onPageChange(event, page + 1);
-  };
+    onPageChange(event, page + 1)
+  }
 
   const handleLastPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
-  };
+    onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1))
+  }
 
   return (
     <Box sx={{ flexShrink: 0, ml: 2.5 }}>
@@ -89,45 +87,41 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
         {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
       </IconButton>
     </Box>
-  );
+  )
 }
-//fin fonction pour s'occuper de la pagination
+// fin fonction pour s'occuper de la pagination
 
-
-
-
-//debut fonction principale List de contact
+// debut fonction principale List de contact
 const ContactList: FC<ContactListProps> = ({ contacts, dispatch }) => {
-
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [page, setPage] = React.useState(0)
+  const [rowsPerPage, setRowsPerPage] = React.useState(5)
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - contacts.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - contacts.length) : 0
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number,
+    newPage: number
   ) => {
-    setPage(newPage);
-  };
+    setPage(newPage)
+  }
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+    setRowsPerPage(parseInt(event.target.value, 10))
+    setPage(0)
+  }
 
   return (
     <div className='contacts-list'>
       <h3 className='contacts-list-title'>List of Contacts</h3>
       <div className='contacts-list-table-container'>
-        
+
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
-            
+
             <TableHead>
                 <TableRow>
                   <TableCell>First Name</TableCell>
@@ -143,7 +137,7 @@ const ContactList: FC<ContactListProps> = ({ contacts, dispatch }) => {
               {(rowsPerPage > 0
                 ? contacts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 : contacts
-              ).map((contacts,index) => (
+              ).map((contacts, index) => (
                 <TableRow key={index}>
                   <TableCell component="th">
                       {contacts.firstName}
@@ -161,7 +155,7 @@ const ContactList: FC<ContactListProps> = ({ contacts, dispatch }) => {
                   <AiFillEdit size={20} className='icon' />
                   </TableCell>
                   <TableCell>
-                  <AiFillDelete size={20} className='icon' />               
+                  <AiFillDelete size={20} className='icon' />
                   </TableCell>
               </TableRow>
               ))}
@@ -184,10 +178,10 @@ const ContactList: FC<ContactListProps> = ({ contacts, dispatch }) => {
                   slotProps={{
                     select: {
                       inputProps: {
-                        'aria-label': 'rows per page',
+                        'aria-label': 'rows per page'
                       },
-                      native: true,
-                    },
+                      native: true
+                    }
                   }}
                   onPageChange={handleChangePage}
                   onRowsPerPageChange={handleChangeRowsPerPage}
@@ -200,6 +194,6 @@ const ContactList: FC<ContactListProps> = ({ contacts, dispatch }) => {
 
       </div>
     </div>
-  );
-};
-export default ContactList;
+  )
+}
+export default ContactList
