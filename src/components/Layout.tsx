@@ -37,7 +37,7 @@ export default function Layout (props: { children: React.ReactNode }): JSX.Eleme
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
           <Typography variant="h6" noWrap component="div">
-            Pharmfinder
+            PharmfinderCRM
           </Typography>
         </Toolbar>
       </AppBar>
@@ -73,7 +73,7 @@ export default function Layout (props: { children: React.ReactNode }): JSX.Eleme
           </List>
         </Box>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box component="main">
         <Toolbar />
         {props.children}
       </Box>
