@@ -1,6 +1,6 @@
 import React, { type FC, useState } from 'react'
 import { Button, TextField, Box, Typography, Switch } from '@mui/material'
-import { type Contact } from '../../types/Contact.type'
+import { type BaseContact } from '../../types/Contact.type'
 import { useCreateContactMutation } from '../../features/contact/ContactApiSlice'
 
 interface ContactFormProps {
@@ -8,7 +8,7 @@ interface ContactFormProps {
 }
 
 const ContactForm: FC<ContactFormProps> = ({ onClose }) => {
-  const [contact, setContact] = useState<Contact>({
+  const [contact, setContact] = useState<BaseContact>({
     contactListId: '',
     firstName: '',
     lastName: '',
