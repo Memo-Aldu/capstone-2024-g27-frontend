@@ -1,5 +1,4 @@
 import React, { type FC } from 'react'
-import { type Action } from './ContactReducer'
 import { useTheme } from '@mui/material/styles'
 import Box from '@mui/material/Box'
 import Table from '@mui/material/Table'
@@ -21,7 +20,6 @@ import { type Contact } from '../../types/Contact.type'
 
 interface ContactListProps {
   contacts?: Contact[]
-  dispatch: React.Dispatch<Action>
 }
 
 interface TablePaginationActionsProps {
@@ -35,25 +33,25 @@ interface TablePaginationActionsProps {
 }
 
 // fonction pour s'occuper de la pagination
-function TablePaginationActions (props: TablePaginationActionsProps) {
+function TablePaginationActions (props: TablePaginationActionsProps): JSX.Element {
   const theme = useTheme()
   const { count, page, rowsPerPage, onPageChange } = props
 
   const handleFirstPageButtonClick = (
     event: React.MouseEvent<HTMLButtonElement>
-  ) => {
+  ): void => {
     onPageChange(event, 0)
   }
 
-  const handleBackButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleBackButtonClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
     onPageChange(event, page - 1)
   }
 
-  const handleNextButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleNextButtonClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
     onPageChange(event, page + 1)
   }
 
-  const handleLastPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleLastPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
     onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1))
   }
 
@@ -93,7 +91,7 @@ function TablePaginationActions (props: TablePaginationActionsProps) {
 // fin fonction pour s'occuper de la pagination
 
 // debut fonction principale List de contact
-const ContactList: FC<ContactListProps> = ({ contacts, dispatch }) => {
+const ContactList: FC<ContactListProps> = ({ contacts }) => {
   const [page, setPage] = React.useState(0)
   const [rowsPerPage, setRowsPerPage] = React.useState(5)
 
@@ -104,13 +102,13 @@ const ContactList: FC<ContactListProps> = ({ contacts, dispatch }) => {
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
-  ) => {
+  ): void => {
     setPage(newPage)
   }
 
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  ): void => {
     setRowsPerPage(parseInt(event.target.value, 10))
     setPage(0)
   }
@@ -154,10 +152,10 @@ const ContactList: FC<ContactListProps> = ({ contacts, dispatch }) => {
                       {contacts.phone}
                   </TableCell>
                   <TableCell>
-                  <AiFillEdit size={20} className='icon' />
+                    <AiFillEdit size={20} className='icon' />
                   </TableCell>
                   <TableCell>
-                  <AiFillDelete size={20} className='icon' />
+                    <AiFillDelete size={20} className='icon' />
                   </TableCell>
               </TableRow>
               ))}
