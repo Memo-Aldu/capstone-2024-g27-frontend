@@ -117,7 +117,7 @@ function Contacts (): JSX.Element {
       >
         <Fade in={open}>
           <Box sx={style}>
-          <ContactForm dispatch={dispatch} onClose={handleClose}/>
+          <ContactForm onClose={handleClose}/>
           </Box>
         </Fade>
       </Modal>

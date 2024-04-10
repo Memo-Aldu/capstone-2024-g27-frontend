@@ -1,65 +1,62 @@
 import React, { type FC, useState } from 'react'
-import { Button, TextField, Box, Typography } from '@mui/material'
-import { type Action, IContact } from './ContactReducer'
+import { Button, TextField, Box, Typography, Switch } from '@mui/material'
+import { type Contact } from '../../types/Contact.type'
+import { useCreateContactMutation } from '../../features/contact/ContactApiSlice'
 
 interface ContactFormProps {
-  dispatch: React.Dispatch<Action>
   onClose: () => void
 }
 
-const ContactForm: FC<ContactFormProps> = ({ dispatch, onClose }) => {
-  // dispatch, onClose
-
-  const [contact, setContact] = useState({
-
+const ContactForm: FC<ContactFormProps> = ({ onClose }) => {
+  const [contact, setContact] = useState<Contact>({
+    contactListId: '',
     firstName: '',
     lastName: '',
+    preferredName: '',
     phone: '',
-    email: ''
+    email: '',
+    fax: '',
+    addressId: '',
+    doNotContact: false
   })
+  const [createContact] = useCreateContactMutation()
 
-  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = event.target
-
     setContact((prevState) => ({
       ...prevState,
       [name]: value
     }))
+    // eslint-disable-next-line no-console
+    console.log(contact)
   }
 
-  const handleOnSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleOnSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
-
-    dispatch({
-      type: 'ADD_CONTACT',
-      payload: {
-        id: Date.now(), // returns current timestamp
-        ...contact
-      }
+    createContact(contact).unwrap().then((response) => {
+      // eslint-disable-next-line no-console
+      console.log(response)
+      onClose()
+    }).catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error(error)
     })
-    onClose()
   }
 
   return (
-
-    <>
-
     <Box
       sx={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
-
       }}
     >
       <Box component={'form'}
         onSubmit={handleOnSubmit}
         sx={{ maxWidth: 600, mx: 'auto', p: 2 }}>
-
         <Typography variant="h4" align="center" mb={2}>
           Add a contact
         </Typography>
-
           <TextField
             fullWidth
             label="First Name"
@@ -67,7 +64,6 @@ const ContactForm: FC<ContactFormProps> = ({ dispatch, onClose }) => {
             onChange={handleOnChange}
             margin="normal"
             name="firstName"
-
           />
           <TextField
             fullWidth
@@ -76,6 +72,14 @@ const ContactForm: FC<ContactFormProps> = ({ dispatch, onClose }) => {
             onChange={handleOnChange}
             margin="normal"
             name = "lastName"
+          />
+          <TextField
+            fullWidth
+            label="Preferred Name"
+            value={contact.preferredName}
+            onChange={handleOnChange}
+            margin="normal"
+            name = "preferredName"
           />
           <TextField
             fullWidth
@@ -92,15 +96,32 @@ const ContactForm: FC<ContactFormProps> = ({ dispatch, onClose }) => {
             onChange={handleOnChange}
             margin="normal"
             name = "phone"
-
           />
-
+          <TextField
+            fullWidth
+            label="fax"
+            value={contact.fax}
+            onChange={handleOnChange}
+            margin="normal"
+            name = "fax"
+          />
+          <Box>
+            <Typography variant='body1'>Do Not Contact</Typography>
+            <Switch
+              checked={contact.doNotContact}
+              onChange={(e) => {
+                setContact((prevState) => ({
+                  ...prevState,
+                  doNotContact: e.target.checked
+                }))
+              }}
+            />
+          </Box>
           <Button variant='contained' type='submit' className='submit-btn'>
             Add Contact
           </Button>
       </Box>
     </Box>
-    </>
   )
 }
 
