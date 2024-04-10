@@ -1,7 +1,7 @@
-import { apiSlice } from '../../app/api/ApiSlice'
+import { ContactApiSlice } from '../../app/api/ContactApiSlice'
 import { type ContactList } from '../../types/ContactList.type'
 
-const contactApiListSlice = apiSlice.injectEndpoints({
+const contactApiListSlice = ContactApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getContactListById: builder.query<ContactList, string>({
       query: (id: string) => ({

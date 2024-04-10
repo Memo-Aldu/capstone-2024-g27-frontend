@@ -1,8 +1,8 @@
-import { apiSlice } from '../../app/api/ApiSlice'
+import { SmsApiSlice } from '../../app/api/SmsApiSlice'
 import { type SMSSendRequest, type SMSScheduleRequest, type SMSBulkSendRequest, type SMSBulkScheduleRequest } from '../../types/SMSRequest.types'
 import { type SMSBulkScheduleResponse, type SMSBulkSendResponse, type SMSScheduleResponse, type SMSSendResponse } from '../../types/SMSResponse.type'
 
-const smsApiSlice = apiSlice.injectEndpoints({
+const smsApiSlice = SmsApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     sendSMS: builder.mutation<SMSSendResponse, SMSSendRequest>({
       query: (sms: SMSSendRequest) => ({

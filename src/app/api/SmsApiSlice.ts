@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
-export const apiSlice = createApi({
+export const SmsApiSlice = createApi({
+  reducerPath: 'smsApi',
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.REACT_APP_SMS_MGMT_URL ?? 'http://localhost:8080/api/v1/sms',
     prepareHeaders: (headers) => {
