@@ -17,6 +17,7 @@ import LastPageIcon from '@mui/icons-material/LastPage'
 import { TableHead } from '@mui/material'
 import { AiFillDelete, AiFillEdit } from 'react-icons/ai'
 import { type Contact } from '../../types/Contact.type'
+import { useDeleteContactMutation } from '../../features/contact/ContactApiSlice'
 
 interface ContactListProps {
   contacts?: Contact[]
@@ -113,6 +114,24 @@ const ContactList: FC<ContactListProps> = ({ contacts }) => {
     setPage(0)
   }
 
+  const [deleteContact] = useDeleteContactMutation()
+
+  const handleDeleteContact = (id: string): void => {
+    deleteContact(id).unwrap().then(() => {
+      // eslint-disable-next-line no-console
+      console.log(`Contact Deleted with id: ${id}`)
+    }).catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error(error)
+    })
+  }
+
+  const handleUpdateContact = (contact: Contact): void => {
+    // eslint-disable-next-line no-console
+    console.log('Update contact', contact)
+    // TODO
+  }
+
   return (
     <div className='contacts-list'>
       <h3 className='contacts-list-title'>List of Contacts</h3>
@@ -137,25 +156,25 @@ const ContactList: FC<ContactListProps> = ({ contacts }) => {
               {(rowsPerPage > 0
                 ? contacts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 : contacts
-              ).map((contacts, index) => (
+              ).map((contact, index) => (
                 <TableRow key={index}>
                   <TableCell component="th">
-                      {contacts.firstName}
+                      {contact.firstName}
                   </TableCell>
                   <TableCell component="th">
-                      {contacts.lastName}
+                      {contact.lastName}
                   </TableCell>
                   <TableCell>
-                      {contacts.email}
+                      {contact.email}
                   </TableCell>
                   <TableCell>
-                      {contacts.phone}
+                      {contact.phone}
                   </TableCell>
                   <TableCell>
-                    <AiFillEdit size={20} className='icon' />
+                    <AiFillEdit size={20} className='icon' onClick={() => { handleUpdateContact(contact) } } />
                   </TableCell>
                   <TableCell>
-                    <AiFillDelete size={20} className='icon' />
+                    <AiFillDelete size={20} className='icon' onClick={() => { handleDeleteContact(contact.id) }} />
                   </TableCell>
               </TableRow>
               ))}

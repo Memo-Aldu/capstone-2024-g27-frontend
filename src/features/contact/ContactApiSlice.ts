@@ -1,5 +1,5 @@
 import { ContactApiSlice } from '../../app/api/ContactApiSlice'
-import { type Contact } from '../../types/Contact.type'
+import { type BaseContact, type Contact } from '../../types/Contact.type'
 
 const contactApiSlice = ContactApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -17,8 +17,8 @@ const contactApiSlice = ContactApiSlice.injectEndpoints({
       }),
       providesTags: ['Contact']
     }),
-    createContact: builder.mutation<Contact, Contact>({
-      query: (contact: Contact) => ({
+    createContact: builder.mutation<Contact, BaseContact>({
+      query: (contact: BaseContact) => ({
         url: '',
         method: 'POST',
         body: contact
