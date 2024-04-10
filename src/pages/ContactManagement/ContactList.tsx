@@ -1,6 +1,6 @@
 import React, { type FC } from 'react'
-import { type IContact, type Action } from './ContactReducer'
-import { alpha, useTheme } from '@mui/material/styles'
+import { type Action } from './ContactReducer'
+import { useTheme } from '@mui/material/styles'
 import Box from '@mui/material/Box'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -17,9 +17,10 @@ import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
 import LastPageIcon from '@mui/icons-material/LastPage'
 import { TableHead } from '@mui/material'
 import { AiFillDelete, AiFillEdit } from 'react-icons/ai'
+import { type Contact } from '../../types/Contact.type'
 
 interface ContactListProps {
-  contacts: IContact[]
+  contacts?: Contact[]
   dispatch: React.Dispatch<Action>
 }
 
@@ -98,7 +99,7 @@ const ContactList: FC<ContactListProps> = ({ contacts, dispatch }) => {
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - contacts.length) : 0
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - (contacts?.length ?? 0)) : 0
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -133,7 +134,8 @@ const ContactList: FC<ContactListProps> = ({ contacts, dispatch }) => {
                 </TableRow>
               </TableHead>
 
-            <TableBody>
+            {contacts !== undefined && (
+              <TableBody>
               {(rowsPerPage > 0
                 ? contacts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 : contacts
@@ -165,14 +167,15 @@ const ContactList: FC<ContactListProps> = ({ contacts, dispatch }) => {
                   <TableCell colSpan={6} />
                 </TableRow>
               )}
-            </TableBody>
+            </TableBody>)
+            }
 
             <TableFooter>
               <TableRow>
                 <TablePagination
                   rowsPerPageOptions={[5, 15, 25, { label: 'All', value: -1 }]}
                   colSpan={3}
-                  count={contacts.length}
+                  count={contacts?.length ?? 0}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   slotProps={{

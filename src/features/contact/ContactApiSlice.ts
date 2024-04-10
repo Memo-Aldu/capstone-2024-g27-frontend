@@ -11,13 +11,13 @@ const contactApiSlice = ContactApiSlice.injectEndpoints({
     }),
     getAllContacts: builder.query<Contact[], void>({
       query: () => ({
-        url: '/',
+        url: '',
         method: 'GET'
       })
     }),
     createContact: builder.mutation<Contact, Contact>({
       query: (contact: Contact) => ({
-        url: '/',
+        url: '',
         method: 'POST',
         body: contact
       })
