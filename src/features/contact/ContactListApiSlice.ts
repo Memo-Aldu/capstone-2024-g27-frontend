@@ -7,33 +7,38 @@ const contactApiListSlice = ContactApiSlice.injectEndpoints({
       query: (id: string) => ({
         url: `/${id}`,
         method: 'GET'
-      })
+      }),
+      providesTags: ['ContactList']
     }),
     getAllContactLists: builder.query<ContactList[], void>({
       query: () => ({
         url: '',
         method: 'GET'
-      })
+      }),
+      providesTags: ['ContactList']
     }),
     createContactList: builder.mutation<ContactList, ContactList>({
       query: (contactList: ContactList) => ({
         url: '',
         method: 'POST',
         body: contactList
-      })
+      }),
+      invalidatesTags: ['ContactList']
     }),
     updateContactList: builder.mutation<ContactList, ContactList>({
       query: (contactList: ContactList) => ({
         url: `/${contactList.id}`,
         method: 'PATCH',
         body: contactList
-      })
+      }),
+      invalidatesTags: ['ContactList']
     }),
     deleteContactList: builder.mutation<void, string>({
       query: (id: string) => ({
         url: `/${id}`,
         method: 'DELETE'
-      })
+      }),
+      invalidatesTags: ['ContactList']
     })
 
   })

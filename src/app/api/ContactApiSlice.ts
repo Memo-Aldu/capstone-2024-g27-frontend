@@ -11,5 +11,6 @@ export const ContactApiSlice = createApi({
       return headers
     }
   }),
+  tagTypes: ['Contact', 'ContactList'],
   endpoints: (builder) => ({})
 })
