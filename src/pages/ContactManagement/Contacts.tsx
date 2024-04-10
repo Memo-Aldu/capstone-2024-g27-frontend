@@ -10,6 +10,7 @@ import Modal from '@mui/material/Modal'
 import Fade from '@mui/material/Fade'
 import GroupAddIcon from '@mui/icons-material/GroupAdd'
 import AddIcon from '@mui/icons-material/Add'
+import { useGetAllContactsQuery } from '../../features/contact/ContactApiSlice'
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -64,6 +65,7 @@ const initialState: State = {
 }
 function Contacts (): JSX.Element {
   const [state, dispatch] = useReducer(contactsReducer, initialState)
+  const { data: contacts } = useGetAllContactsQuery()
   const [showModal, setShowModal] = useState(false)
 
   const onClose = () => {
@@ -95,7 +97,7 @@ function Contacts (): JSX.Element {
 
           </Grid>
           <Grid item xs={12}>
-          {(<ContactList contacts={state.contacts} dispatch={dispatch}/>)}
+          {(<ContactList contacts={contacts} dispatch={dispatch}/>)}
           </Grid>
         </Grid>
 
