@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { apiSlice } from './api/ApiSlice'
+import { SmsApiSlice } from './api/SmsApiSlice'
+import { ContactApiSlice } from './api/ContactApiSlice'
 
 export const store = configureStore({
   reducer: {
-    [apiSlice.reducerPath]: apiSlice.reducer
+    [SmsApiSlice.reducerPath]: SmsApiSlice.reducer,
+    [ContactApiSlice.reducerPath]: ContactApiSlice.reducer
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(apiSlice.middleware)
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(SmsApiSlice.middleware, ContactApiSlice.middleware)
 })
 
 export type RootState = ReturnType<typeof store.getState>
