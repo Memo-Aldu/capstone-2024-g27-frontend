@@ -3,33 +3,33 @@ import { type ContactList } from '../../types/ContactList.type'
 
 const contactApiListSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getContactListById: builder.query({
+    getContactListById: builder.query<ContactList, string>({
       query: (id: string) => ({
         url: `/${id}`,
         method: 'GET'
       })
     }),
-    getAllContactLists: builder.query({
+    getAllContactLists: builder.query<ContactList[], void>({
       query: () => ({
         url: '/',
         method: 'GET'
       })
     }),
-    createContactList: builder.mutation({
+    createContactList: builder.mutation<ContactList, ContactList>({
       query: (contactList: ContactList) => ({
         url: '/',
         method: 'POST',
         body: contactList
       })
     }),
-    updateContactList: builder.mutation({
+    updateContactList: builder.mutation<ContactList, ContactList>({
       query: (contactList: ContactList) => ({
         url: `/${contactList.id}`,
         method: 'PATCH',
         body: contactList
       })
     }),
-    deleteContactList: builder.mutation({
+    deleteContactList: builder.mutation<void, string>({
       query: (id: string) => ({
         url: `/${id}`,
         method: 'DELETE'
