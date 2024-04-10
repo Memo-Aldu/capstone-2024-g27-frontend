@@ -1,15 +1,11 @@
 import { Box, Button, Grid, Typography } from '@mui/material'
 import ContactManagementLayout from './ContactManagementLayout'
-import { useEffect, useState, useReducer } from 'react'
 import ContactForm from './ContactForm'
-import { contactsReducer, IContact, type State } from './ContactReducer'
 import ContactList from './ContactList'
 import * as React from 'react'
 import Backdrop from '@mui/material/Backdrop'
 import Modal from '@mui/material/Modal'
 import Fade from '@mui/material/Fade'
-import GroupAddIcon from '@mui/icons-material/GroupAdd'
-import AddIcon from '@mui/icons-material/Add'
 import { useGetAllContactsQuery } from '../../features/contact/ContactApiSlice'
 
 const style = {
@@ -24,10 +20,10 @@ const style = {
   p: 4
 }
 
-export function TransitionsModal () {
+export function TransitionsModal (): JSX.Element {
   const [open, setOpen] = React.useState(false)
-  const handleOpen = () => { setOpen(true) }
-  const handleClose = () => { setOpen(false) }
+  const handleOpen = (): void => { setOpen(true) }
+  const handleClose = (): void => { setOpen(false) }
 
   return (
     <div>
@@ -60,21 +56,11 @@ export function TransitionsModal () {
   )
 }
 
-const initialState: State = {
-  contacts: []
-}
 function Contacts (): JSX.Element {
-  const [state, dispatch] = useReducer(contactsReducer, initialState)
   const { data: contacts } = useGetAllContactsQuery()
-  const [showModal, setShowModal] = useState(false)
-
-  const onClose = () => {
-    setShowModal((show) => !show)
-  }
-
   const [open, setOpen] = React.useState(false)
-  const handleOpen = () => { setOpen(true) }
-  const handleClose = () => { setOpen(false) }
+  const handleOpen = (): void => { setOpen(true) }
+  const handleClose = (): void => { setOpen(false) }
 
   return (
 
@@ -97,7 +83,7 @@ function Contacts (): JSX.Element {
 
           </Grid>
           <Grid item xs={12}>
-          {(<ContactList contacts={contacts} dispatch={dispatch}/>)}
+          {(<ContactList contacts={contacts}/>)}
           </Grid>
         </Grid>
 

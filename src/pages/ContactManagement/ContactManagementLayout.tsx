@@ -1,4 +1,3 @@
-import { Typography } from '@mui/material'
 import GroupsIcon from '@mui/icons-material/Groups'
 import Drawer from '@mui/material/Drawer'
 import List from '@mui/material/List'

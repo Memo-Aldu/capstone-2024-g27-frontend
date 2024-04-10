@@ -16,7 +16,6 @@ import ListItemText from '@mui/material/ListItemText'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import { useNavigate } from 'react-router-dom'
-import ContactManagementLayout from '../pages/ContactManagement/ContactManagementLayout'
 
 const drawerWidth = 200
 
