@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Box,
   Button,
   Grid,
@@ -16,6 +17,7 @@ import { useScheduleBulkSMSMutation, useScheduleSMSMutation, useSendBulkSMSMutat
 import { type BaseSMSRequest } from '../../types/SMSRequest.types'
 import { type AnySMSResponse } from '../../types/SMSResponse.type'
 import { validatePhoneNumber } from '../../features/sms/SmsHelper'
+import { useGetAllContactsQuery } from '../../features/contact/ContactApiSlice'
 
 interface FormErrors {
   toError: string
@@ -44,6 +46,7 @@ function QuickSMS (): JSX.Element {
   const [scheduleSMS] = useScheduleSMSMutation()
   const [sendBulkSMS] = useSendBulkSMSMutation()
   const [scheduleBulkSMS] = useScheduleBulkSMSMutation()
+  const { data: contacts } = useGetAllContactsQuery()
 
   const handleAddRecipient = (): { newToError: string, newRecipients: string[] } => {
     const newRecipients = [...recipients]
@@ -115,6 +118,8 @@ function QuickSMS (): JSX.Element {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
+    // eslint-disable-next-line no-console
+    console.log(contacts)
     const smsRequest = validateSMSRequest()
     // eslint-disable-next-line no-console
     console.log(smsRequest)
@@ -188,41 +193,56 @@ function QuickSMS (): JSX.Element {
         onSubmit={handleSubmit}
       >
         <Grid sx={{ display: 'flex', my: 2, alignItems: 'center' }} container>
-          <Grid item xs={4}>
-            <TextField
-              label="To"
-              required
-              fullWidth
+          <Grid item xs={10}>
+            <Autocomplete
+              disablePortal
+              id="to"
               value={to}
-              onChange={(e) => {
-                setTo(e.target.value)
+              onChange={(e, newValue) => {
+                setTo(newValue ?? '')
               }}
-              error={errors.toError !== ''}
-              helperText={errors.toError}
+              options={contacts?.map((contact) => contact.phone) ?? []}
+              sx={{ my: 2 }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="To"
+                  required
+                  fullWidth
+                  error={errors.toError !== ''}
+                  helperText={errors.toError}
+                />
+              )}
             />
           </Grid>
           <Grid item xs={2}>
             <Button onClick={handleAddRecipient}>Add</Button>
           </Grid>
-          <Grid item xs={6}>
-            {recipients.map((recipient) => (
-              <Typography key={recipient} variant="body1" component="span">
-                {recipient},
-              </Typography>
-            ))}
-          </Grid>
         </Grid>
-        <TextField
+        {recipients.map((recipient) => (
+          <Typography key={recipient} variant="body1" component="span">
+            {recipient},
+          </Typography>
+        ))}
+        <Autocomplete
+          disablePortal
+          id="sender"
+          options={[process.env.REACT_APP_TWILIO_NUMBER ?? '']}
           sx={{ my: 2 }}
-          label="From"
-          required
-          fullWidth
           value={sender}
-          onChange={(e) => {
-            setSender(e.target.value)
+          onChange={(e, newValue) => {
+            setSender(newValue ?? '')
           }}
-          error={errors.fromError !== ''}
-          helperText={errors.fromError}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="From"
+              required
+              fullWidth
+              error={errors.fromError !== ''}
+              helperText={errors.fromError}
+            />
+          )}
         />
         <TextField
           sx={{ my: 2 }}
@@ -237,7 +257,9 @@ function QuickSMS (): JSX.Element {
           }}
           error={errors.messageError !== ''}
           helperText={errors.messageError}
-          InputProps={{ endAdornment: <Typography>{messageContent.length}/160</Typography> }}
+          InputProps={{
+            endAdornment: <Typography>{messageContent.length}/160</Typography>
+          }}
           // TODO: Change Color of the text based on the length of the message + add a warning if the message is too long
         />
         <Box sx={{ display: 'flex', my: 2, alignItems: 'center' }}>
@@ -247,7 +269,9 @@ function QuickSMS (): JSX.Element {
           <Switch
             id="schedule"
             name="schedule"
-            onChange={(e) => { setScheduled(e.target.checked) }}
+            onChange={(e) => {
+              setScheduled(e.target.checked)
+            }}
           />
           {scheduled && (
             <LocalizationProvider dateAdapter={AdapterDayjs}>
