@@ -1,8 +1,10 @@
+import CheckBoxIcon from '@mui/icons-material/CheckBox'
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank'
 import {
   Autocomplete,
   Box,
   Button,
-  Grid,
+  Checkbox,
   Switch,
   TextField,
   Typography
@@ -13,14 +15,15 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import MessagingLayout from '../../components/MessagingLayout'
+import { useGetAllContactsQuery } from '../../features/contact/ContactApiSlice'
 import { useScheduleBulkSMSMutation, useScheduleSMSMutation, useSendBulkSMSMutation, useSendSMSMutation } from '../../features/sms/SmsApiSlice'
+import { validatePhoneNumber } from '../../features/sms/SmsHelper'
 import { type BaseSMSRequest } from '../../types/SMSRequest.types'
 import { type AnySMSResponse } from '../../types/SMSResponse.type'
-import { validatePhoneNumber } from '../../features/sms/SmsHelper'
-import { useGetAllContactsQuery } from '../../features/contact/ContactApiSlice'
+import { type Recipient } from '../../types/Contact.type'
 
 interface FormErrors {
-  toError: string
+  recipientError: string
   fromError: string
   messageError: string
   scheduleError: string
@@ -29,13 +32,13 @@ interface FormErrors {
 
 function QuickSMS (): JSX.Element {
   const [sender, setSender] = useState('')
-  const [to, setTo] = useState('')
-  const [recipients, setRecipients] = useState<string[]>([])
+  const [recipientInput, setRecipientInput] = useState('')
+  const [recipients, setRecipients] = useState<Recipient[]>([])
   const [messageContent, setMessageContent] = useState('')
   const [scheduled, setScheduled] = useState(false)
   const [scheduleTime, setScheduledTime] = useState<Date | null>(null)
   const [errors, setErrors] = useState<FormErrors>({
-    toError: '',
+    recipientError: '',
     fromError: '',
     messageError: '',
     scheduleError: '',
@@ -48,37 +51,23 @@ function QuickSMS (): JSX.Element {
   const [scheduleBulkSMS] = useScheduleBulkSMSMutation()
   const { data: contacts } = useGetAllContactsQuery()
 
-  const handleAddRecipient = (): { newToError: string, newRecipients: string[] } => {
-    const newRecipients = [...recipients]
-    let newToError = ''
-    if (to === '') {
-      newToError = 'Recipient cannot be empty'
-    } else if (validatePhoneNumber(to)) {
-      newRecipients.push(to)
-      setTo('')
-    } else {
-      newToError = 'Invalid Phone Number'
+  function getRecipientLabel (option: Recipient): string {
+    if (typeof option === 'string') {
+      return option
     }
-    setRecipients(newRecipients)
-    setErrors({ ...errors, toError: newToError })
-    return { newToError, newRecipients }
+    return `${option.firstName} ${option.lastName} - ${option.phone}`
   }
 
   const validateSMSRequest = (): BaseSMSRequest | undefined => {
     const newErrors: FormErrors = {
-      toError: '',
+      recipientError: '',
       fromError: '',
       messageError: '',
       scheduleError: '',
       bulkError: ''
     }
-    let currentRecipients = recipients
-    let newToError = ''
-    if (to !== '') {
-      ({ newToError, newRecipients: currentRecipients } = handleAddRecipient())
-      newErrors.toError = newToError
-    } else if (recipients.length === 0) {
-      newErrors.toError = 'At least one recipient is required'
+    if (recipients.length === 0) {
+      newErrors.recipientError = 'At least one recipient is required'
     }
 
     if (sender === '') {
@@ -107,7 +96,7 @@ function QuickSMS (): JSX.Element {
     setErrors(newErrors)
     if (Object.values(newErrors).every((error) => error === '')) {
       return {
-        recipients: currentRecipients,
+        recipients: recipients.map((r) => (typeof r === 'string' ? r : r.phone)),
         sender,
         messageContent,
         scheduled,
@@ -118,8 +107,6 @@ function QuickSMS (): JSX.Element {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
-    // eslint-disable-next-line no-console
-    console.log(contacts)
     const smsRequest = validateSMSRequest()
     // eslint-disable-next-line no-console
     console.log(smsRequest)
@@ -192,38 +179,63 @@ function QuickSMS (): JSX.Element {
         autoComplete="off"
         onSubmit={handleSubmit}
       >
-        <Grid sx={{ display: 'flex', my: 2, alignItems: 'center' }} container>
-          <Grid item xs={10}>
-            <Autocomplete
-              disablePortal
-              id="to"
-              value={to}
-              onChange={(e, newValue) => {
-                setTo(newValue ?? '')
-              }}
-              options={contacts?.map((contact) => contact.phone) ?? []}
-              sx={{ my: 2 }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="To"
-                  required
-                  fullWidth
-                  error={errors.toError !== ''}
-                  helperText={errors.toError}
-                />
-              )}
+        <Autocomplete
+          disablePortal
+          id="recipients"
+          options={contacts ?? []}
+          value={recipients}
+          getOptionLabel={(option) => getRecipientLabel(option)}
+          multiple
+          freeSolo
+          disableCloseOnSelect
+          sx={{ my: 2 }}
+          onInputChange={(e, value) => {
+            setRecipientInput(value)
+          }}
+          onChange={(e, newRecipients, reason) => {
+            if (reason === 'createOption') {
+              if (validatePhoneNumber(recipientInput)) {
+                setRecipients([...recipients, recipientInput])
+                setRecipientInput('')
+                setErrors({
+                  ...errors,
+                  recipientError: ''
+                })
+              } else {
+                setErrors({
+                  ...errors,
+                  recipientError: 'Invalid Phone Number'
+                })
+              }
+            } else {
+              setRecipients(newRecipients)
+              setErrors({
+                ...errors,
+                recipientError: ''
+              })
+            }
+          }}
+          renderOption={(props, option, { selected }) => (
+            <li {...props}>
+              <Checkbox
+                icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                checkedIcon={<CheckBoxIcon fontSize="small" />}
+                style={{ marginRight: 8 }}
+                checked={selected}
+              />
+              {getRecipientLabel(option)}
+            </li>
+          )}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="To"
+              fullWidth
+              error={errors.recipientError !== ''}
+              helperText={errors.recipientError}
             />
-          </Grid>
-          <Grid item xs={2}>
-            <Button onClick={handleAddRecipient}>Add</Button>
-          </Grid>
-        </Grid>
-        {recipients.map((recipient) => (
-          <Button key={recipient} component="span" onClick={() => { setRecipients(recipients.filter((r) => r !== recipient)) }} onMouseEnter={(e) => { e.currentTarget.style.color = 'red' }} onMouseLeave={(e) => { e.currentTarget.style.color = '' }}>
-            {recipient},
-          </Button>
-        ))}
+          )}
+        />
         <Autocomplete
           disablePortal
           id="sender"

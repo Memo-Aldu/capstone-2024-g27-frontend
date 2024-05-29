@@ -13,3 +13,5 @@ export interface BaseContact {
 export interface Contact extends BaseContact {
   id: string
 }
+
+export type Recipient = Contact | string
