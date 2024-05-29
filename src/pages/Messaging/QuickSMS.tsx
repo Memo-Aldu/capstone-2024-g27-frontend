@@ -1,10 +1,7 @@
-import CheckBoxIcon from '@mui/icons-material/CheckBox'
-import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank'
 import {
   Autocomplete,
   Box,
   Button,
-  Checkbox,
   Switch,
   TextField,
   Typography
@@ -21,6 +18,7 @@ import { validatePhoneNumber } from '../../features/sms/SmsHelper'
 import { type BaseSMSRequest } from '../../types/SMSRequest.types'
 import { type AnySMSResponse } from '../../types/SMSResponse.type'
 import { type Recipient } from '../../types/Contact.type'
+import ContactAutoComplete from '../../components/ContactAutoComplete'
 
 interface FormErrors {
   recipientError: string
@@ -50,13 +48,6 @@ function QuickSMS (): JSX.Element {
   const [sendBulkSMS] = useSendBulkSMSMutation()
   const [scheduleBulkSMS] = useScheduleBulkSMSMutation()
   const { data: contacts } = useGetAllContactsQuery()
-
-  function getRecipientLabel (option: Recipient): string {
-    if (typeof option === 'string') {
-      return option
-    }
-    return `${option.firstName} ${option.lastName} - ${option.phone}`
-  }
 
   const validateSMSRequest = (): BaseSMSRequest | undefined => {
     const newErrors: FormErrors = {
@@ -179,63 +170,7 @@ function QuickSMS (): JSX.Element {
         autoComplete="off"
         onSubmit={handleSubmit}
       >
-        <Autocomplete
-          disablePortal
-          id="recipients"
-          options={contacts ?? []}
-          value={recipients}
-          getOptionLabel={(option) => getRecipientLabel(option)}
-          multiple
-          freeSolo
-          disableCloseOnSelect
-          sx={{ my: 2 }}
-          onInputChange={(e, value) => {
-            setRecipientInput(value)
-          }}
-          onChange={(e, newRecipients, reason) => {
-            if (reason === 'createOption') {
-              if (validatePhoneNumber(recipientInput)) {
-                setRecipients([...recipients, recipientInput])
-                setRecipientInput('')
-                setErrors({
-                  ...errors,
-                  recipientError: ''
-                })
-              } else {
-                setErrors({
-                  ...errors,
-                  recipientError: 'Invalid Phone Number'
-                })
-              }
-            } else {
-              setRecipients(newRecipients)
-              setErrors({
-                ...errors,
-                recipientError: ''
-              })
-            }
-          }}
-          renderOption={(props, option, { selected }) => (
-            <li {...props}>
-              <Checkbox
-                icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
-                checkedIcon={<CheckBoxIcon fontSize="small" />}
-                style={{ marginRight: 8 }}
-                checked={selected}
-              />
-              {getRecipientLabel(option)}
-            </li>
-          )}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="To"
-              fullWidth
-              error={errors.recipientError !== ''}
-              helperText={errors.recipientError}
-            />
-          )}
-        />
+        <ContactAutoComplete contacts={contacts} recipients={recipients} setRecipients={setRecipients} recipientInput={recipientInput} setRecipientInput={setRecipientInput} errors={errors} setErrors={setErrors} />
         <Autocomplete
           disablePortal
           id="sender"
