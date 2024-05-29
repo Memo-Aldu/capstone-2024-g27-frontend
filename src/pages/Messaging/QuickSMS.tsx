@@ -220,9 +220,9 @@ function QuickSMS (): JSX.Element {
           </Grid>
         </Grid>
         {recipients.map((recipient) => (
-          <Typography key={recipient} variant="body1" component="span">
+          <Button key={recipient} component="span" onClick={() => { setRecipients(recipients.filter((r) => r !== recipient)) }} onMouseEnter={(e) => { e.currentTarget.style.color = 'red' }} onMouseLeave={(e) => { e.currentTarget.style.color = '' }}>
             {recipient},
-          </Typography>
+          </Button>
         ))}
         <Autocomplete
           disablePortal
