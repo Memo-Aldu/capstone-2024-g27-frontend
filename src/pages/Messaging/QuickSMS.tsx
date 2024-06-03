@@ -11,14 +11,20 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import dayjs from 'dayjs'
 import { useState } from 'react'
+import ContactAutoComplete from '../../components/ContactAutoComplete'
 import MessagingLayout from '../../components/MessagingLayout'
+import SmsConfirmationModal from '../../components/SmsConfirmationModal'
 import { useGetAllContactsQuery } from '../../features/contact/ContactApiSlice'
-import { useScheduleBulkSMSMutation, useScheduleSMSMutation, useSendBulkSMSMutation, useSendSMSMutation } from '../../features/sms/SmsApiSlice'
+import {
+  useScheduleBulkSMSMutation,
+  useScheduleSMSMutation,
+  useSendBulkSMSMutation,
+  useSendSMSMutation
+} from '../../features/sms/SmsApiSlice'
 import { validatePhoneNumber } from '../../features/sms/SmsHelper'
+import { type Recipient } from '../../types/Contact.type'
 import { type BaseSMSRequest } from '../../types/SMSRequest.types'
 import { type AnySMSResponse } from '../../types/SMSResponse.type'
-import { type Recipient } from '../../types/Contact.type'
-import ContactAutoComplete from '../../components/ContactAutoComplete'
 
 interface FormErrors {
   recipientError: string
@@ -42,11 +48,13 @@ function QuickSMS (): JSX.Element {
     scheduleError: '',
     bulkError: ''
   })
-
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
+  const [smsRequest, setSmsRequest] = useState<BaseSMSRequest | undefined>(undefined)
   const [sendSMS] = useSendSMSMutation()
   const [scheduleSMS] = useScheduleSMSMutation()
   const [sendBulkSMS] = useSendBulkSMSMutation()
   const [scheduleBulkSMS] = useScheduleBulkSMSMutation()
+
   const { data: contacts } = useGetAllContactsQuery()
 
   const validateSMSRequest = (): BaseSMSRequest | undefined => {
@@ -101,62 +109,73 @@ function QuickSMS (): JSX.Element {
     const smsRequest = validateSMSRequest()
     // eslint-disable-next-line no-console
     console.log(smsRequest)
+
     if (smsRequest !== undefined) {
-      handleSmsRequest(smsRequest).then((response) => {
-        // eslint-disable-next-line no-console
-        console.log(response)
-      }).catch((error) => {
-        // eslint-disable-next-line no-console
-        console.error(error)
-      })
+      setSmsRequest(smsRequest)
+      setConfirmationModalOpen(true)
     } else {
       // eslint-disable-next-line no-console
       console.error('Invalid SMS Request')
     }
   }
 
-  const handleSmsRequest = async (request: BaseSMSRequest): Promise<AnySMSResponse> => {
-    const { recipients, sender, messageContent, scheduled, scheduleTime } = request
-    const bulk = recipients.length > 1
-    let result: AnySMSResponse
-    if (scheduled) {
-    // Send Scheduled SMS
-      if (bulk) {
-      // Send Bulk Scheduled SMS
-        result = await scheduleBulkSMS({
-          recipients,
-          sender,
-          content: messageContent,
-          scheduleTime
-        }).unwrap()
+  const handleConfirmSend = (): void => {
+    setConfirmationModalOpen(false)
+    handleSmsRequest(smsRequest).then((response) => {
+      // eslint-disable-next-line no-console
+      console.log(response)
+    }).catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error(error)
+    })
+  }
+
+  const handleSmsRequest = async (request?: BaseSMSRequest): Promise<AnySMSResponse> => {
+    if (request !== undefined) {
+      const { recipients, sender, messageContent, scheduled, scheduleTime } = request
+      const bulk = recipients.length > 1
+      let result: Promise<AnySMSResponse>
+      if (scheduled) {
+        // Send Scheduled SMS
+        if (bulk) {
+          // Send Bulk Scheduled SMS
+          result = scheduleBulkSMS({
+            recipients,
+            sender,
+            content: messageContent,
+            scheduleTime
+          }).unwrap()
+        } else {
+          // Send Scheduled SMS
+          result = scheduleSMS({
+            recipient: recipients[0],
+            sender,
+            content: messageContent,
+            scheduleTime
+          }).unwrap()
+        }
       } else {
-      // Send Scheduled SMS
-        result = await scheduleSMS({
-          recipient: recipients[0],
-          sender,
-          content: messageContent,
-          scheduleTime
-        }).unwrap()
+        // Send Immediate SMS
+        if (bulk) {
+          // Send Bulk Immediate SMS
+          result = sendBulkSMS({
+            recipients,
+            sender,
+            content: messageContent
+          }).unwrap()
+        } else {
+          // Send Immediate SMS
+          result = sendSMS({
+            recipient: recipients[0],
+            sender,
+            content: messageContent
+          }).unwrap()
+        }
       }
+      return await result
     } else {
-    // Send Immediate SMS
-      if (bulk) {
-      // Send Bulk Immediate SMS
-        result = await sendBulkSMS({
-          recipients,
-          sender,
-          content: messageContent
-        }).unwrap()
-      } else {
-      // Send Immediate SMS
-        result = await sendSMS({
-          recipient: recipients[0],
-          sender,
-          content: messageContent
-        }).unwrap()
-      }
+      throw new Error('Invalid SMS Request')
     }
-    return result
   }
 
   return (
@@ -205,9 +224,8 @@ function QuickSMS (): JSX.Element {
           error={errors.messageError !== ''}
           helperText={errors.messageError}
           InputProps={{
-            endAdornment: <Typography>{messageContent.length}/160</Typography>
+            endAdornment: <Typography>{messageContent.length}/{(Math.floor(messageContent.length / 160) + 1) * 160}</Typography>
           }}
-          // TODO: Change Color of the text based on the length of the message + add a warning if the message is too long
         />
         <Box sx={{ display: 'flex', my: 2, alignItems: 'center' }}>
           <Typography variant="body1" component="span">
@@ -239,10 +257,15 @@ function QuickSMS (): JSX.Element {
             </LocalizationProvider>
           )}
         </Box>
-        <Button sx={{ my: 2 }} type="submit" variant="contained">
+        <Button sx={{ my: 2 }} type="submit" variant="contained" color={messageContent.length > 160 ? 'warning' : 'primary'}>
           Send
         </Button>
       </Box>
+      <SmsConfirmationModal
+        open={confirmationModalOpen}
+        setOpen={setConfirmationModalOpen}
+        smsRequest={smsRequest}
+        handleConfirmSend={handleConfirmSend} />
     </MessagingLayout>
   )
 }
