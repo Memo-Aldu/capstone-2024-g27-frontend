@@ -1,5 +1,5 @@
 import { Box, Button, Modal, Typography } from '@mui/material'
-import { type BaseSMSRequest } from '../types/SMSRequest.types'
+import { type BaseSMSRequest } from 'src/types/SMSRequest.types'
 
 interface SmsConfirmationModalProps {
   open: boolean

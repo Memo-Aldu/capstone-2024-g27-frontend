@@ -16,8 +16,8 @@ import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
 import LastPageIcon from '@mui/icons-material/LastPage'
 import { TableHead } from '@mui/material'
 import { AiFillDelete, AiFillEdit } from 'react-icons/ai'
-import { type Contact } from '../../types/Contact.type'
-import { useDeleteContactMutation } from '../../features/contact/ContactApiSlice'
+import { type Contact } from 'src/types/Contact.type'
+import { useDeleteContactMutation } from 'src/features/contact/ContactApiSlice'
 
 interface ContactListProps {
   contacts?: Contact[]

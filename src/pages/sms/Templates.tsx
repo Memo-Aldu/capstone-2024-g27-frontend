@@ -1,14 +1,14 @@
 import { Typography } from '@mui/material'
-import MessagingLayout from '../../components/MessagingLayout'
+import MessagingLayout from 'src/components/sms/MessagingLayout'
 
-function Campaign (): JSX.Element {
+function Templates (): JSX.Element {
   return (
     <MessagingLayout>
         <Typography variant="h4" component="h1" gutterBottom>
-          Campaign
+          Templates
         </Typography>
     </MessagingLayout>
   )
 }
 
-export default Campaign
+export default Templates

@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { SmsApiSlice } from './api/SmsApiSlice'
-import { ContactApiSlice } from './api/ContactApiSlice'
+import { SmsApiSlice } from 'src/features/api/SmsApiSlice'
+import { ContactApiSlice } from 'src/features/api/ContactApiSlice'
 
 export const store = configureStore({
   reducer: {

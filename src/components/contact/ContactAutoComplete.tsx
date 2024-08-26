@@ -1,8 +1,8 @@
 import { Autocomplete, Checkbox, TextField } from '@mui/material'
-import { validatePhoneNumber } from '../features/sms/SmsHelper'
+import { validatePhoneNumber } from 'src/features/sms/SmsHelper'
 import CheckBoxIcon from '@mui/icons-material/CheckBox'
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank'
-import { type Recipient, type Contact } from '../types/Contact.type'
+import { type Recipient, type Contact } from 'src/types/Contact.type'
 
 interface ContactAutoCompleteProps {
   contacts?: Contact[]

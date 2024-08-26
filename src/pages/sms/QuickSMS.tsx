@@ -11,20 +11,20 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import dayjs from 'dayjs'
 import { useState } from 'react'
-import ContactAutoComplete from '../../components/ContactAutoComplete'
-import MessagingLayout from '../../components/MessagingLayout'
-import SmsConfirmationModal from '../../components/SmsConfirmationModal'
-import { useGetAllContactsQuery } from '../../features/contact/ContactApiSlice'
+import ContactAutoComplete from 'src/components/contact/ContactAutoComplete'
+import MessagingLayout from 'src/components/sms/MessagingLayout'
+import SmsConfirmationModal from 'src/components/sms/SmsConfirmationModal'
+import { useGetAllContactsQuery } from 'src/features/contact/ContactApiSlice'
 import {
   useScheduleBulkSMSMutation,
   useScheduleSMSMutation,
   useSendBulkSMSMutation,
   useSendSMSMutation
-} from '../../features/sms/SmsApiSlice'
-import { validatePhoneNumber } from '../../features/sms/SmsHelper'
-import { type Recipient } from '../../types/Contact.type'
-import { type BaseSMSRequest } from '../../types/SMSRequest.types'
-import { type AnySMSResponse } from '../../types/SMSResponse.type'
+} from 'src/features/sms/SmsApiSlice'
+import { validatePhoneNumber } from 'src/features/sms/SmsHelper'
+import { type Recipient } from 'src/types/Contact.type'
+import { type BaseSMSRequest } from 'src/types/SMSRequest.types'
+import { type AnySMSResponse } from 'src/types/SMSResponse.type'
 
 interface FormErrors {
   recipientError: string

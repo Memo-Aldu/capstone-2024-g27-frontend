@@ -1,12 +1,12 @@
 import { Box, Button, Grid, Typography } from '@mui/material'
-import ContactManagementLayout from './ContactManagementLayout'
+import ContactManagementLayout from 'src/components/contact/ContactManagementLayout'
 import ContactForm from './ContactForm'
 import ContactList from './ContactList'
 import * as React from 'react'
 import Backdrop from '@mui/material/Backdrop'
 import Modal from '@mui/material/Modal'
 import Fade from '@mui/material/Fade'
-import { useGetAllContactsQuery } from '../../features/contact/ContactApiSlice'
+import { useGetAllContactsQuery } from 'src/features/contact/ContactApiSlice'
 
 const style = {
   position: 'absolute' as 'absolute',

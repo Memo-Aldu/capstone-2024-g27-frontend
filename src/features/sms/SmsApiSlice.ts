@@ -1,6 +1,6 @@
-import { SmsApiSlice } from '../../app/api/SmsApiSlice'
-import { type SMSSendRequest, type SMSScheduleRequest, type SMSBulkSendRequest, type SMSBulkScheduleRequest } from '../../types/SMSRequest.types'
-import { type SMSBulkScheduleResponse, type SMSBulkSendResponse, type SMSScheduleResponse, type SMSSendResponse } from '../../types/SMSResponse.type'
+import { SmsApiSlice } from '../api/SmsApiSlice'
+import { type SMSSendRequest, type SMSScheduleRequest, type SMSBulkSendRequest, type SMSBulkScheduleRequest } from 'src/types/SMSRequest.types'
+import { type SMSBulkScheduleResponse, type SMSBulkSendResponse, type SMSScheduleResponse, type SMSSendResponse } from 'src/types/SMSResponse.type'
 
 const smsApiSlice = SmsApiSlice.injectEndpoints({
   endpoints: (builder) => ({
