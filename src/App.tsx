@@ -1,5 +1,4 @@
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
-import './App.css'
 import Layout from 'src/components/Layout'
 import Home from 'src/pages/Home'
 import MessagingLayout from 'src/components/sms/MessagingLayout'
