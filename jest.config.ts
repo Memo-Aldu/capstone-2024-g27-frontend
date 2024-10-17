@@ -18,7 +18,7 @@ const config: Config.InitialOptions = {
     '!src/**/index.tsx'
   ],
   moduleNameMapper: {
-    "src/(.*)": "<rootDir>/src/$1"
+    'src/(.*)': '<rootDir>/src/$1'
   }
 }
 

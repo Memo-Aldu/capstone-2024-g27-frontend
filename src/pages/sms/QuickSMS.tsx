@@ -224,7 +224,7 @@ function QuickSMS (): JSX.Element {
           error={errors.messageError !== ''}
           helperText={errors.messageError}
           InputProps={{
-            endAdornment: <Typography>{messageContent.length}/{(Math.floor(messageContent.length / 160) + 1) * 160}</Typography>
+            endAdornment: <Typography data-testid='char-count'>{messageContent.length}/{(Math.floor(messageContent.length / 160) + 1) * 160}</Typography>
           }}
         />
         <Box sx={{ display: 'flex', my: 2, alignItems: 'center' }}>
