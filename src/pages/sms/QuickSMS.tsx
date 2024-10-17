@@ -1,7 +1,10 @@
+import CloseIcon from '@mui/icons-material/Close'
 import {
   Autocomplete,
   Box,
   Button,
+  IconButton,
+  Snackbar,
   Switch,
   TextField,
   Typography
@@ -10,7 +13,7 @@ import { DateTimePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import dayjs from 'dayjs'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import ContactAutoComplete from 'src/components/contact/ContactAutoComplete'
 import MessagingLayout from 'src/components/sms/MessagingLayout'
 import SmsConfirmationModal from 'src/components/sms/SmsConfirmationModal'
@@ -50,6 +53,10 @@ function QuickSMS (): JSX.Element {
   })
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
   const [smsRequest, setSmsRequest] = useState<BaseSMSRequest | undefined>(undefined)
+
+  const [snackbarMessage, setSnackbarMessage] = useState('')
+  const [snackbarOpen, setSnackbarOpen] = useState(false)
+
   const [sendSMS] = useSendSMSMutation()
   const [scheduleSMS] = useScheduleSMSMutation()
   const [sendBulkSMS] = useSendBulkSMSMutation()
@@ -107,26 +114,22 @@ function QuickSMS (): JSX.Element {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
     const smsRequest = validateSMSRequest()
-    // eslint-disable-next-line no-console
-    console.log(smsRequest)
-
     if (smsRequest !== undefined) {
       setSmsRequest(smsRequest)
       setConfirmationModalOpen(true)
     } else {
-      // eslint-disable-next-line no-console
-      console.error('Invalid SMS Request')
+      throw new Error('Invalid SMS Request')
     }
   }
 
   const handleConfirmSend = (): void => {
     setConfirmationModalOpen(false)
     handleSmsRequest(smsRequest).then((response) => {
-      // eslint-disable-next-line no-console
-      console.log(response)
-    }).catch((error) => {
-      // eslint-disable-next-line no-console
-      console.error(error)
+      setSnackbarMessage('SMS sent successfully')
+      setSnackbarOpen(true)
+      setSmsRequest(undefined)
+    }).catch(() => {
+      throw new Error('Error sending SMS')
     })
   }
 
@@ -177,6 +180,27 @@ function QuickSMS (): JSX.Element {
       throw new Error('Invalid SMS Request')
     }
   }
+
+  const handleCloseSnackbar = (): void => {
+    setSnackbarOpen(false)
+    setSnackbarMessage('')
+  }
+
+  const snackbarAction = (
+    <React.Fragment>
+      <Button color="secondary" size="small" onClick={handleCloseSnackbar}>
+        UNDO
+      </Button>
+      <IconButton
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={handleCloseSnackbar}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </React.Fragment>
+  )
 
   return (
     <MessagingLayout>
@@ -266,6 +290,12 @@ function QuickSMS (): JSX.Element {
         setOpen={setConfirmationModalOpen}
         smsRequest={smsRequest}
         handleConfirmSend={handleConfirmSend} />
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        message={snackbarMessage}
+        action={snackbarAction} />
     </MessagingLayout>
   )
 }
