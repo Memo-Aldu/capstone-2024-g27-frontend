@@ -1,6 +1,6 @@
 // src/types/Conversation.type.ts
 // Define a type for the full API response
-export interface ConversationApiResponse {
+export interface Conversations {
   httpStatus: string
   responseStatus: string
   responseMessage: string

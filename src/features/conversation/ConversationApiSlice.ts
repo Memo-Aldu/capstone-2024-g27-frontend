@@ -1,15 +1,15 @@
 import { ConversationApiSlice } from '../../app/api/ConversationApiSlice'
-import { type ConversationApiResponse, type BaseConversation } from '../../types/Conversation.type'
+import { type Conversations, type BaseConversation } from '../../types/Conversation.type'
 
 const conversationApiSlice = ConversationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getConversations: builder.query<ConversationApiResponse[], void>({
+    getConversations: builder.query<Conversations[], void>({
       query: () => ''
     }),
     getConversationById: builder.query<BaseConversation, string>({
       query: (id) => `${id}`
     }),
-    getConversationsByParticipant: builder.query<ConversationApiResponse, { participantId: string, page: number, size: number, sortBy?: string, order?: string }
+    getConversationsByParticipant: builder.query<Conversations, { participantId: string, page: number, size: number, sortBy?: string, order?: string }
     >({
       query: ({ participantId, page, size, sortBy = 'updatedTime', order = 'desc' }) => ({
         url: `user/${participantId}`,
