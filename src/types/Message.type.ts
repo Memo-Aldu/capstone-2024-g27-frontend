@@ -1,4 +1,13 @@
 // src/types/Message.types.ts
+export interface Messages {
+  httpStatus: string
+  responseStatus: string
+  responseMessage: string
+  data: MessageResponse[]
+  currentPage: number
+  totalPages: number
+  totalElements: number
+}
 export interface MessageRequest {
   userId: string
   from: string

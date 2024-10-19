@@ -1,5 +1,5 @@
 import { MessageApiSlice } from '../../app/api/MessageApiSlice'
-import { type MessageRequest, type MessageResponse } from '../../types/Message.type'
+import { type MessageRequest, type MessageResponse, type Messages } from '../../types/Message.type'
 
 const messageApiSlice = MessageApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -16,7 +16,7 @@ const messageApiSlice = MessageApiSlice.injectEndpoints({
         method: 'GET'
       })
     }),
-    getMessages: builder.query<MessageResponse[], { userId: string, contactId: string, page?: number, size?: number, sortBy?: string, order?: string }>({
+    getMessages: builder.query<Messages, { userId: string, contactId: string, page?: number, size?: number, sortBy?: string, order?: string }>({
       query: ({ userId, contactId, page = 0, size = 10, sortBy = 'createdTime', order = 'desc' }) => ({
         url: '',
         method: 'GET',
