@@ -1,5 +1,5 @@
 import { Box, Button, Grid, Typography } from '@mui/material'
-import ContactManagementLayout from 'src/components/contact/ContactManagementLayout'
+import ContactManagementLayout from 'src/components/ContactManagementLayout'
 import ContactForm from './ContactForm'
 import ContactList from './ContactList'
 import * as React from 'react'

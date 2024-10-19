@@ -1,5 +1,5 @@
 import { Typography } from '@mui/material'
-import ContactManagementLayout from 'src/components/contact/ContactManagementLayout'
+import ContactManagementLayout from 'src/components/ContactManagementLayout'
 
 function Groupes (): JSX.Element {
   return (
