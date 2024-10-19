@@ -1,14 +1,16 @@
 import { configureStore, type EnhancedStore } from '@reduxjs/toolkit'
-import { ContactApiSlice } from 'src/features/api/ContactApiSlice'
-import { SmsApiSlice } from 'src/features/api/SmsApiSlice'
+import { MessageApiSlice } from './api/MessageApiSlice'
+import { ContactApiSlice } from './api/ContactApiSlice'
+import { ConversationApiSlice } from './api/ConversationApiSlice'
 
 export const setupStore = (preloadedState = {}): EnhancedStore =>
   configureStore({
     reducer: {
-      [SmsApiSlice.reducerPath]: SmsApiSlice.reducer,
-      [ContactApiSlice.reducerPath]: ContactApiSlice.reducer
+      [MessageApiSlice.reducerPath]: MessageApiSlice.reducer,
+      [ContactApiSlice.reducerPath]: ContactApiSlice.reducer,
+      [ConversationApiSlice.reducerPath]: ConversationApiSlice.reducer
     },
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(SmsApiSlice.middleware, ContactApiSlice.middleware),
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(MessageApiSlice.middleware, ContactApiSlice.middleware, ConversationApiSlice.middleware),
     preloadedState
   })
 
