@@ -17,7 +17,7 @@ function MessagingLayout (props: { children?: React.ReactNode }): JSX.Element {
   const navigate = useNavigate()
   const drawerWidth = 200
   const menuItems = [
-    { name: 'Quick SMS', path: '/messaging/quicksms', icon: <SendIcon /> },
+    { name: 'Quick Message', path: '/messaging/quickmessage', icon: <SendIcon /> },
     { name: 'Conversation', path: '/messaging/conversation', icon: <ChatIcon /> },
     { name: 'Campaign', path: '/messaging/campaign', icon: <CampaignIcon /> },
     { name: 'Templates', path: '/messaging/templates', icon: <UpcomingIcon /> },

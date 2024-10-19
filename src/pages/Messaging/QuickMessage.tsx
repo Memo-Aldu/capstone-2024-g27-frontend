@@ -187,7 +187,7 @@ function QuickMessage (): JSX.Element {
               error={errors.messageError !== ''}
               helperText={errors.messageError}
               InputProps={{
-                endAdornment: <Typography>{messageContent.length}/160</Typography>
+                endAdornment: <Typography data-testid="char-count">{messageContent.length}/160</Typography>
               }}
           />
           <Button sx={{ my: 2 }} type="submit" variant="contained">
