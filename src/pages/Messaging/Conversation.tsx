@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Grid, List, ListItem, ListItemAvatar, Avatar, CircularProgress, Typography, Box, TextField, Button } from '@mui/material'
 import { useGetConversationsByParticipantQuery } from '../../features/conversation/ConversationApiSlice'
 import { useGetContactByIdQuery } from '../../features/contact/ContactApiSlice'
@@ -16,7 +16,7 @@ const Conversation: React.FC = () => {
   const [newMessage, setNewMessage] = useState('')
 
   const { data: conversationsResponse, isLoading: isLoadingConversations } = useGetConversationsByParticipantQuery({ participantId: userId, page: 0, size: 10 })
-  const { data: messagesResponse, isLoading: isLoadingMessages } = useGetMessagesQuery({ userId, contactId: selectedContactId ?? '', page: 0, size: 10 }, { skip: selectedContactId == null })
+  const { data: messagesResponse, isLoading: isLoadingMessages, refetch: refetchMessages } = useGetMessagesQuery({ userId, contactId: selectedContactId ?? '', page: 0, size: 10 }, { skip: selectedContactId == null })
   const [sendMessage] = useSendMessageMutation()
 
   useEffect(() => {
@@ -37,10 +37,7 @@ const Conversation: React.FC = () => {
   }
 
   const formatPhoneNumber = (phone: string): string => {
-    // Remove all non-digit characters
     const digitsOnly = phone.replace(/\D/g, '')
-
-    // Ensure the number starts with a country code (assuming US, so adding +1 if not present)
     return digitsOnly.startsWith('1') ? `+${digitsOnly}` : `+1${digitsOnly}`
   }
 
@@ -61,11 +58,30 @@ const Conversation: React.FC = () => {
         const response = await sendMessage(messageRequest).unwrap()
         setMessages(prevMessages => [...prevMessages, response])
         setNewMessage('')
+        void refetchMessages()
       } catch (error) {
       }
     }
   }
+  const updateMessages = useCallback(() => {
+    if (messagesResponse?.data != null) {
+      setMessages(messagesResponse.data)
+    }
+  }, [messagesResponse])
 
+  useEffect(() => {
+    updateMessages()
+  }, [updateMessages])
+
+  useEffect(() => {
+    const pollInterval = setInterval(() => {
+      if (selectedContactId != null) {
+        void refetchMessages()
+      }
+    }, 2000)
+
+    return () => { clearInterval(pollInterval) }
+  }, [selectedContactId, refetchMessages])
   const ConversationItem: React.FC<{ conversation: BaseConversation }> = ({ conversation }) => {
     const { data: contact, isLoading } = useGetContactByIdQuery(conversation.contactId)
 
