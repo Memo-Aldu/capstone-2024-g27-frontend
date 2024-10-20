@@ -1,14 +1,14 @@
 import { Box, Button, Modal, Typography } from '@mui/material'
-import { type BaseSMSRequest } from 'src/types/SMSRequest.types'
+import { type MessageRequest } from 'src/types/Message.type'
 
-interface SmsConfirmationModalProps {
+interface MsgConfirmationModalProps {
   open: boolean
   setOpen: (open: boolean) => void
-  smsRequest?: BaseSMSRequest
+  msgRequest?: MessageRequest
   handleConfirmSend: () => void
 }
 
-const SmsConfirmationModal = ({ open, setOpen, smsRequest, handleConfirmSend }: SmsConfirmationModalProps): JSX.Element => {
+const MsgConfirmationModal = ({ open, setOpen, msgRequest, handleConfirmSend }: MsgConfirmationModalProps): JSX.Element => {
   return (
     <Modal open={open}>
       <Box
@@ -22,13 +22,13 @@ const SmsConfirmationModal = ({ open, setOpen, smsRequest, handleConfirmSend }: 
           p: 4
         }}
       >
-        <Typography variant="h4">Confirm SMS</Typography>
+        <Typography variant="h4">Confirm Message</Typography>
         <Typography variant="body1">
-          Recipient: {smsRequest?.recipients}
+          Recipient: {msgRequest?.messageItems.map((item) => item.to).join(', ')}
         </Typography>
-        <Typography variant="body1">From: {smsRequest?.sender}</Typography>
+        <Typography variant="body1">From: {msgRequest?.from}</Typography>
         <Typography variant="body1">
-          Message: {smsRequest?.messageContent}
+          Message: {msgRequest?.messageItems[0].content}
         </Typography>
         <Button
           variant="contained"
@@ -48,4 +48,4 @@ const SmsConfirmationModal = ({ open, setOpen, smsRequest, handleConfirmSend }: 
   )
 }
 
-export default SmsConfirmationModal
+export default MsgConfirmationModal

@@ -9,10 +9,11 @@ import { useState } from 'react'
 import MessagingLayout from '../../components/MessagingLayout'
 import { useSendMessageMutation } from '../../features/message/MessageApiSlice'
 import { type MessageRequest, type MessageResponse } from '../../types/Message.type'
-import { validatePhoneNumber } from '../../features/message/SmsHelper'
+import { validatePhoneNumber } from '../../features/message/MsgHelper'
 import { useGetAllContactsQuery } from '../../features/contact/ContactApiSlice'
 import ContactAutoComplete from 'src/components/ContactAutoComplete'
 import { type Contact } from 'src/types/Contact.type'
+import MsgConfirmationModal from 'src/components/MsgConfirmationModal'
 
 interface FormErrors {
   recipientError: string
@@ -30,11 +31,15 @@ function QuickMessage (): JSX.Element {
     fromError: '',
     messageError: ''
   })
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
+  const [msgRequest, setMsgRequest] = useState<MessageRequest | undefined>(
+    undefined
+  )
 
   const [sendSMS] = useSendMessageMutation()
   const { data: contacts } = useGetAllContactsQuery()
 
-  const validateSMSRequest = (): MessageRequest | undefined => {
+  const validateMsgRequest = (): MessageRequest | undefined => {
     const newErrors: FormErrors = {
       recipientError: '',
       fromError: '',
@@ -69,24 +74,31 @@ function QuickMessage (): JSX.Element {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
-    const smsRequest = validateSMSRequest()
-    if (smsRequest !== undefined) {
-      handleSmsRequest(smsRequest).then((response) => {
-        // eslint-disable-next-line no-console
-        console.log(response)
-      }).catch((error) => {
-        // eslint-disable-next-line no-console
-        console.error(error)
-      })
-    } else {
-      // eslint-disable-next-line no-console
-      console.error('Invalid SMS Request')
+    const tmpMsgRequest = validateMsgRequest()
+    if (tmpMsgRequest != null) {
+      setMsgRequest(tmpMsgRequest)
+      setConfirmationModalOpen(true)
     }
   }
 
-  const handleSmsRequest = async (request: MessageRequest): Promise<MessageResponse> => {
-    const result = await sendSMS(request).unwrap()
-    return result
+  const handleConfirmSend = (): void => {
+    setConfirmationModalOpen(false)
+    handleMsgRequest(msgRequest)
+      .then((response) => {
+        // eslint-disable-next-line no-console
+        console.log(response)
+      })
+      .catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error(error)
+      })
+  }
+
+  const handleMsgRequest = async (request?: MessageRequest): Promise<MessageResponse> => {
+    if (request != null) {
+      const result = await sendSMS(request).unwrap()
+      return result
+    } else throw new Error('Invalid request')
   }
 
   return (
@@ -154,6 +166,12 @@ function QuickMessage (): JSX.Element {
           Send
         </Button>
       </Box>
+      <MsgConfirmationModal
+        open={confirmationModalOpen}
+        setOpen={setConfirmationModalOpen}
+        msgRequest={msgRequest}
+        handleConfirmSend={handleConfirmSend}
+      />
     </MessagingLayout>
   )
 }
