@@ -14,6 +14,8 @@ import { useGetAllContactsQuery } from '../../features/contact/ContactApiSlice'
 import ContactAutoComplete from 'src/components/ContactAutoComplete'
 import { type Contact } from 'src/types/Contact.type'
 import MsgConfirmationModal from 'src/components/MsgConfirmationModal'
+import { useDispatch } from 'react-redux'
+import { showSnackbar } from 'src/features/snackbar/snackbarSlice'
 
 interface FormErrors {
   recipientError: string
@@ -22,6 +24,13 @@ interface FormErrors {
 }
 
 function QuickMessage (): JSX.Element {
+  const dispatch = useDispatch()
+  const notify = (message: string, severity: 'success' | 'error' | 'warning' | 'info'): void => {
+    dispatch(
+      showSnackbar({ message, severity })
+    )
+  }
+
   const [sender, setSender] = useState('')
   const [to, setTo] = useState('')
   const [recipients, setRecipients] = useState<Contact[]>([])
@@ -85,12 +94,11 @@ function QuickMessage (): JSX.Element {
     setConfirmationModalOpen(false)
     handleMsgRequest(msgRequest)
       .then((response) => {
-        // eslint-disable-next-line no-console
-        console.log(response)
+        notify(`Message sent to ${recipients.length} recipients`, 'success')
       })
       .catch((error) => {
-        // eslint-disable-next-line no-console
-        console.error(error)
+        notify('Error sending message', 'error')
+        throw error
       })
   }
 

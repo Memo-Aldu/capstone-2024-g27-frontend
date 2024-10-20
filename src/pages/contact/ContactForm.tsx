@@ -2,12 +2,22 @@ import React, { type FC, useState } from 'react'
 import { Button, TextField, Box, Typography, Switch } from '@mui/material'
 import { type BaseContact } from 'src/types/Contact.type'
 import { useCreateContactMutation } from 'src/features/contact/ContactApiSlice'
+import { showSnackbar } from 'src/features/snackbar/snackbarSlice'
+import { useDispatch } from 'react-redux'
 
 interface ContactFormProps {
   onClose: () => void
 }
 
 const ContactForm: FC<ContactFormProps> = ({ onClose }) => {
+  const dispatch = useDispatch()
+  const notify = (
+    message: string,
+    severity: 'success' | 'error' | 'warning' | 'info'
+  ): void => {
+    dispatch(showSnackbar({ message, severity }))
+  }
+
   const [contact, setContact] = useState<BaseContact>({
     contactListId: '',
     firstName: '',
@@ -27,19 +37,16 @@ const ContactForm: FC<ContactFormProps> = ({ onClose }) => {
       ...prevState,
       [name]: value
     }))
-    // eslint-disable-next-line no-console
-    console.log(contact)
   }
 
   const handleOnSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
     createContact(contact).unwrap().then((response) => {
-      // eslint-disable-next-line no-console
-      console.log(response)
+      notify('Contact created', 'success')
       onClose()
     }).catch((error) => {
-      // eslint-disable-next-line no-console
-      console.error(error)
+      notify('Error creating contact', 'error')
+      throw error
     })
   }
 
