@@ -40,8 +40,8 @@ const MsgConfirmationModal = ({ open, setOpen, msgRequest, handleConfirmSend }: 
         >
           Cancel
         </Button>
-        <Button variant="contained" color='primary' onClick={handleConfirmSend}>
-          Send
+        <Button variant="contained" color='primary' onClick={handleConfirmSend} data-testid="confirm-send-btn">
+          Confirm Send
         </Button>
       </Box>
     </Modal>

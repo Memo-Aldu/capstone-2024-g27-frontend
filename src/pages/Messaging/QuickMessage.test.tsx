@@ -1,4 +1,4 @@
-import { screen, fireEvent, type RenderResult } from '@testing-library/react'
+import { screen, fireEvent, type RenderResult, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import QuickMessage from './QuickMessage'
 import { renderWithProviders } from 'src/utils/test-utils/RenderWithProviders'
@@ -140,15 +140,16 @@ describe('QuickMessage', () => {
     renderQuickMessage()
 
     const toField = screen.getByLabelText(/To/i)
-    const addButton = screen.getByText(/Add/i)
+    const recipientsAutocomplete = screen.getByTestId('contact-auto-complete')
 
     // Simulate entering a valid phone number
     fireEvent.change(toField, { target: { value: '1234567890' } })
-    fireEvent.click(addButton)
+    const contactCheckbox = await waitFor(() => screen.getByText(/John Doe - 1234567890/i))
+    fireEvent.click(contactCheckbox)
 
     // Check that the recipient was added to the list
-    expect(screen.getByText(/1234567890/i)).toBeInTheDocument()
     expect(toField).toHaveValue('')
+    expect(recipientsAutocomplete).toHaveTextContent('John Doe - 1234567890')
     expect(screen.queryByText(/Invalid Phone Number/i)).not.toBeInTheDocument()
   })
 
@@ -156,40 +157,27 @@ describe('QuickMessage', () => {
     renderQuickMessage()
 
     const toField = screen.getByLabelText(/To/i)
-    const addButton = screen.getByText(/Add/i)
 
     // Simulate entering an invalid phone number
     fireEvent.change(toField, { target: { value: 'abcde12345' } })
-    fireEvent.click(addButton)
+    fireEvent.click(screen.getByText(/Send/i))
 
-    // Check that the error message is displayed
-    expect(
-      await screen.findByText(/Invalid Phone Number/i)
-    ).toBeInTheDocument()
+    // Not applicable for now since we can only add contacts
+    // expect(
+    //   await screen.findByText(/Invalid Phone Number/i)
+    // ).toBeInTheDocument()
     expect(screen.queryByText(/abcde12345/i)).not.toBeInTheDocument()
-  })
-
-  it('displays an error when trying to add an empty recipient', async () => {
-    renderQuickMessage()
-
-    const addButton = screen.getByText(/Add/i)
-    fireEvent.click(addButton)
-
-    // Check that the error message is displayed
-    expect(
-      await screen.findByText(/Recipient cannot be empty/i)
-    ).toBeInTheDocument()
   })
 
   it('clears the To field after a recipient is added', async () => {
     renderQuickMessage()
 
     const toField = screen.getByLabelText(/To/i)
-    const addButton = screen.getByText(/Add/i)
 
     // Enter a valid recipient and add them
     fireEvent.change(toField, { target: { value: '1234567890' } })
-    fireEvent.click(addButton)
+    const contactCheckbox = await waitFor(() => screen.getByText(/John Doe - 1234567890/i))
+    fireEvent.click(contactCheckbox)
 
     // The To field should now be empty
     expect(toField).toHaveValue('')
@@ -199,18 +187,114 @@ describe('QuickMessage', () => {
     renderQuickMessage()
 
     const toField = screen.getByLabelText(/To/i)
-    const addButton = screen.getByText(/Add/i)
 
     // Add a recipient
     fireEvent.change(toField, { target: { value: '1234567890' } })
-    fireEvent.click(addButton)
-    expect(screen.getByText(/1234567890/i)).toBeInTheDocument()
+    const contactCheckbox = await waitFor(() => screen.getByText(/John Doe - 1234567890/i))
+    fireEvent.click(contactCheckbox)
 
-    // Simulate removing the recipient (assume a remove button exists)
-    const removeButton = screen.getByText(/Remove/i)
-    fireEvent.click(removeButton)
+    const removeBtn = screen.getByTestId('CancelIcon')
+    fireEvent.click(removeBtn)
 
-    // Verify recipient is removed
-    expect(screen.queryByText(/1234567890/i)).not.toBeInTheDocument()
+    const contactsAutocomplete = screen.getByTestId('contact-auto-complete')
+
+    expect(toField).toHaveValue('')
+    expect(contactsAutocomplete).not.toHaveTextContent('John Doe - 1234567890')
+  })
+
+  it('opens the confirmation modal when message request is valid', async () => {
+    renderQuickMessage()
+
+    // Fill in valid data
+    const fromField = screen.getByLabelText(/From/i)
+    fireEvent.change(fromField, {
+      target: { value: process.env.REACT_APP_TWILIO_NUMBER }
+    })
+
+    const messageField = screen.getByLabelText(/Message/i)
+    fireEvent.change(messageField, {
+      target: { value: 'Test message content' }
+    })
+
+    const toField = screen.getByLabelText(/To/i)
+    fireEvent.change(toField, { target: { value: '1234567890' } })
+    const contactCheckbox = await waitFor(() =>
+      screen.getByText(/John Doe - 1234567890/i)
+    )
+    fireEvent.click(contactCheckbox)
+
+    fireEvent.click(screen.getByText(/Send/i))
+
+    expect(screen.getByText(/Confirm Message/i)).toBeInTheDocument()
+    expect(screen.getByTestId('confirm-send-btn')).toBeInTheDocument()
+  })
+
+  it('displays snackbar when message sent', async () => {
+    renderQuickMessage()
+
+    // Fill in valid data
+    const fromField = screen.getByLabelText(/From/i)
+    fireEvent.change(fromField, {
+      target: { value: process.env.REACT_APP_TWILIO_NUMBER }
+    })
+
+    const messageField = screen.getByLabelText(/Message/i)
+    fireEvent.change(messageField, {
+      target: { value: 'Test message content' }
+    })
+
+    const toField = screen.getByLabelText(/To/i)
+    fireEvent.change(toField, { target: { value: '1234567890' } })
+    const contactCheckbox = await waitFor(() =>
+      screen.getByText(/John Doe - 1234567890/i)
+    )
+    fireEvent.click(contactCheckbox)
+
+    fireEvent.click(screen.getByText(/Send/i))
+
+    // Confirm the modal
+    const confirmButton = screen.getByTestId('confirm-send-btn')
+    fireEvent.click(confirmButton)
+
+    expect(
+      await screen.findByText(/Message sent to 1 recipients/i)
+    ).toBeInTheDocument()
+  })
+
+  it('displays error snackbar when sending message fails', async () => {
+    renderQuickMessage()
+
+    jest.mock('../../features/message/MessageApiSlice.ts', () => ({
+      useSendMessageMutation: () => [
+        jest.fn().mockRejectedValue(new Error('Failed to send message'))
+      ]
+    }))
+
+    // Fill in valid data
+    const fromField = screen.getByLabelText(/From/i)
+    fireEvent.change(fromField, {
+      target: { value: process.env.REACT_APP_TWILIO_NUMBER }
+    })
+
+    const messageField = screen.getByLabelText(/Message/i)
+    fireEvent.change(messageField, {
+      target: { value: 'Test message content' }
+    })
+
+    const toField = screen.getByLabelText(/To/i)
+    fireEvent.change(toField, { target: { value: '1234567890' } })
+    const contactCheckbox = await waitFor(() =>
+      screen.getByText(/John Doe - 1234567890/i)
+    )
+    fireEvent.click(contactCheckbox)
+
+    fireEvent.click(screen.getByText(/Send/i))
+
+    const confirmButton = screen.getByTestId('confirm-send-btn')
+    fireEvent.click(confirmButton)
+
+    expect(
+      await screen.findByText(/Error sending message/i)
+    ).toBeInTheDocument()
   })
 })
