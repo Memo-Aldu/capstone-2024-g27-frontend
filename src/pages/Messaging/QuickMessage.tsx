@@ -5,6 +5,9 @@ import {
   TextField,
   Typography
 } from '@mui/material'
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { useState } from 'react'
 import MessagingLayout from '../../components/MessagingLayout'
 import { useSendMessageMutation } from '../../features/message/MessageApiSlice'
@@ -13,6 +16,10 @@ import { validatePhoneNumber } from '../../features/message/SmsHelper'
 import { useGetAllContactsQuery } from '../../features/contact/ContactApiSlice'
 import ContactAutoComplete from 'src/components/ContactAutoComplete'
 import { type Contact } from 'src/types/Contact.type'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+
+dayjs.extend(utc)
 
 interface FormErrors {
   recipientError: string
@@ -25,6 +32,7 @@ function QuickMessage (): JSX.Element {
   const [to, setTo] = useState('')
   const [recipients, setRecipients] = useState<Contact[]>([])
   const [messageContent, setMessageContent] = useState('')
+  const [scheduledDate, setScheduledDate] = useState<Date | null>(null)
   const [errors, setErrors] = useState<FormErrors>({
     recipientError: '',
     fromError: '',
@@ -53,6 +61,12 @@ function QuickMessage (): JSX.Element {
       newErrors.messageError = 'Message cannot be empty'
     }
 
+    recipients.forEach((recipient, index) => {
+      if (!validatePhoneNumber(recipient.phone)) {
+        newErrors.recipientError = `Invalid phone number for recipient ${index + 1}`
+      }
+    })
+
     setErrors(newErrors)
     if (Object.values(newErrors).every((error) => error === '')) {
       return {
@@ -62,7 +76,8 @@ function QuickMessage (): JSX.Element {
           content: messageContent,
           contactId: recipient.id,
           to: recipient.phone
-        }))
+        })),
+        scheduledDate: (scheduledDate != null) ? dayjs(scheduledDate).utc().format() : undefined
       }
     }
   }
@@ -72,14 +87,14 @@ function QuickMessage (): JSX.Element {
     const smsRequest = validateSMSRequest()
     if (smsRequest !== undefined) {
       handleSmsRequest(smsRequest).then((response) => {
-        // eslint-disable-next-line no-console
+        // eslint-disable-next-line
         console.log(response)
       }).catch((error) => {
-        // eslint-disable-next-line no-console
+        // eslint-disable-next-line
         console.error(error)
       })
     } else {
-      // eslint-disable-next-line no-console
+      // eslint-disable-next-line
       console.error('Invalid SMS Request')
     }
   }
@@ -150,6 +165,16 @@ function QuickMessage (): JSX.Element {
             )
           }}
         />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DateTimePicker
+            label="Schedule Date & Time"
+            value={scheduledDate}
+            onChange={(date) => { setScheduledDate(date) }}
+            slotProps={{
+              textField: { fullWidth: true, sx: { my: 2 } }
+            }}
+          />
+        </LocalizationProvider>
         <Button sx={{ my: 2 }} type="submit" variant="contained">
           Send
         </Button>
