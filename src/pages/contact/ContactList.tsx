@@ -18,6 +18,8 @@ import { TableHead } from '@mui/material'
 import { AiFillDelete, AiFillEdit } from 'react-icons/ai'
 import { type Contact } from 'src/types/Contact.type'
 import { useDeleteContactMutation } from 'src/features/contact/ContactApiSlice'
+import { useDispatch } from 'react-redux'
+import { showSnackbar } from 'src/features/snackbar/snackbarSlice'
 
 interface ContactListProps {
   contacts?: Contact[]
@@ -93,6 +95,14 @@ function TablePaginationActions (props: TablePaginationActionsProps): JSX.Elemen
 
 // debut fonction principale List de contact
 const ContactList: FC<ContactListProps> = ({ contacts }) => {
+  const dispatch = useDispatch()
+  const notify = (
+    message: string,
+    severity: 'success' | 'error' | 'warning' | 'info'
+  ): void => {
+    dispatch(showSnackbar({ message, severity }))
+  }
+
   const [page, setPage] = React.useState(0)
   const [rowsPerPage, setRowsPerPage] = React.useState(5)
 
@@ -118,11 +128,10 @@ const ContactList: FC<ContactListProps> = ({ contacts }) => {
 
   const handleDeleteContact = (id: string): void => {
     deleteContact(id).unwrap().then(() => {
-      // eslint-disable-next-line no-console
-      console.log(`Contact Deleted with id: ${id}`)
+      notify('Contact deleted', 'success')
     }).catch((error) => {
-      // eslint-disable-next-line no-console
-      console.error(error)
+      notify('Error deleting contact', 'error')
+      throw error
     })
   }
 

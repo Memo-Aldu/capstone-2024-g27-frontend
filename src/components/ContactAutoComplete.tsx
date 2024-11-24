@@ -30,6 +30,7 @@ const ContactAutoComplete = ({
     <Autocomplete
       disablePortal
       id="recipients"
+      data-testid="contact-auto-complete"
       options={contacts ?? []}
       value={recipients}
       getOptionLabel={(option) => getRecipientLabel(option)}
