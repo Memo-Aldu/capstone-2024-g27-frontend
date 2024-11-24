@@ -1,16 +1,12 @@
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
-import './App.css'
-import Layout from './components/Layout'
-import Home from './pages/Home'
-import MessagingLayout from './components/MessagingLayout'
-import QuickSMS from './pages/Messaging/QuickSMS'
-import Campaign from './pages/Messaging/Campaign'
-import Templates from './pages/Messaging/Templates'
-import EmailToSMS from './pages/Messaging/EmailToSMS'
-import History from './pages/Messaging/History'
-import ContactManagementLayout from './pages/ContactManagement/ContactManagementLayout'
-import Contacts from './pages/ContactManagement/Contacts'
-import Groupes from './pages/ContactManagement/Groupes'
+import Layout from 'src/components/Layout'
+import Home from 'src/pages/Home'
+import MessagingLayout from 'src/components/MessagingLayout'
+import QuickMessage from 'src/pages/Messaging/QuickMessage'
+import ContactManagementLayout from 'src/components/ContactManagementLayout'
+import Contacts from 'src/pages/contact/Contacts'
+import Conversation from 'src/pages/Messaging/Conversation'
+import Placeholder from 'src/pages/Placeholer'
 
 function App (): JSX.Element {
   return (
@@ -19,15 +15,15 @@ function App (): JSX.Element {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/messaging" element={<MessagingLayout/>} />
-          <Route path="/messaging/quicksms" element={<QuickSMS/>} />
-          <Route path="/messaging/campaign" element={<Campaign/>} />
-          <Route path="/messaging/templates" element={<Templates/>} />
-          <Route path="/messaging/emailToSMS" element={<EmailToSMS/>} />
-          <Route path="/messaging/history" element={<History/>} />
+          <Route path="/messaging/quickmessage" element={<QuickMessage/>} />
+          <Route path="/messaging/campaign" element={<Placeholder title="Campaign" />} />
+          <Route path="/messaging/templates" element={<Placeholder title="Templates" />} />
+          <Route path="/messaging/emailToSMS" element={<Placeholder title="Email to SMS" />} />
+          <Route path="/messaging/history" element={<Placeholder title="History" />} />
           <Route path="/contact-management" element={<ContactManagementLayout />} />
           <Route path="/ContactManagement/contacts" element={<Contacts />} />
-          <Route path="/ContactManagement/groupes" element={<Groupes />} />
-
+          <Route path="/ContactManagement/groupes" element={<Placeholder title="Groupes" />} />
+          <Route path="/messaging/conversation" element={<Conversation />} />
         </Routes>
       </Layout>
     </Router>
