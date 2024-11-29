@@ -6,9 +6,12 @@ import { useGetMessagesQuery, useSendMessageMutation } from '../../features/mess
 import type { Contact } from '../../types/Contact.type'
 import type { BaseConversation } from '../../types/Conversation.type'
 import type { MessageResponse, MessageRequest } from '../../types/Message.type'
+import { useSelector } from 'react-redux'
+import type { RootState } from 'src/app/store'
 
 const Conversation: React.FC = () => {
-  const userId = '12345'
+  const { user } = useSelector((state: RootState) => state.auth)
+  const userId = user?.localAccountId ?? ''
   const [conversations, setConversations] = useState<BaseConversation[]>([])
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null)
   const [selectedContactPhone, setSelectedContactPhone] = useState<string | null>(null)

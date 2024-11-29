@@ -17,11 +17,12 @@ import { useGetAllContactsQuery } from '../../features/contact/ContactApiSlice'
 import ContactAutoComplete from 'src/components/ContactAutoComplete'
 import { type Contact } from 'src/types/Contact.type'
 import MsgConfirmationModal from 'src/components/MsgConfirmationModal'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { showSnackbar } from 'src/features/snackbar/snackbarSlice'
 
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+import type { RootState } from 'src/app/store'
 
 dayjs.extend(utc)
 
@@ -33,6 +34,8 @@ interface FormErrors {
 
 function QuickMessage (): JSX.Element {
   const dispatch = useDispatch()
+  const { user } = useSelector((state: RootState) => state.auth)
+  const userId = user?.localAccountId ?? ''
   const notify = (message: string, severity: 'success' | 'error' | 'warning' | 'info'): void => {
     dispatch(
       showSnackbar({ message, severity })
@@ -85,7 +88,7 @@ function QuickMessage (): JSX.Element {
     setErrors(newErrors)
     if (Object.values(newErrors).every((error) => error === '')) {
       return {
-        userId: '12345', // Replace with actual userId
+        userId,
         from: sender,
         messageItems: recipients.map((recipient) => ({
           content: messageContent,
