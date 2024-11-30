@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Grid, List, ListItem, ListItemAvatar, Avatar, CircularProgress, Typography, Box, TextField, Button } from '@mui/material'
+import { List, ListItem, ListItemAvatar, ListItemText, Avatar, CircularProgress, Typography, Box, TextField, Button } from '@mui/material'
 import { useGetConversationsByParticipantQuery } from '../../features/conversation/ConversationApiSlice'
 import { useGetContactByIdQuery } from '../../features/contact/ContactApiSlice'
 import { useGetMessagesQuery, useSendMessageMutation } from '../../features/message/MessageApiSlice'
 import type { Contact } from '../../types/Contact.type'
 import type { BaseConversation } from '../../types/Conversation.type'
 import type { MessageResponse, MessageRequest } from '../../types/Message.type'
+import MessagingLayout from '../../components/MessagingLayout'
 
 const Conversation: React.FC = () => {
   const userId = '12345'
@@ -63,6 +64,7 @@ const Conversation: React.FC = () => {
       }
     }
   }
+
   const updateMessages = useCallback(() => {
     if (messagesResponse?.data != null) {
       setMessages(messagesResponse.data)
@@ -82,21 +84,41 @@ const Conversation: React.FC = () => {
 
     return () => { clearInterval(pollInterval) }
   }, [selectedContactId, refetchMessages])
+
   const ConversationItem: React.FC<{ conversation: BaseConversation }> = ({ conversation }) => {
     const { data: contact, isLoading } = useGetContactByIdQuery(conversation.contactId)
 
     if (isLoading || (contact == null)) {
       return null
     }
+
     const renderContactInitials = (contact: Contact): string => {
       return `${contact.firstName[0]}${contact.lastName[0]}`.toUpperCase()
     }
 
     return (
-        <ListItem>
+        <ListItem
+            button
+            onClick={() => { handleContactClick(conversation.contactId, contact.phone) }}
+            selected={selectedContactId === conversation.contactId}
+            sx={{
+              mb: 1,
+              borderRadius: 1,
+              '&.Mui-selected': {
+                backgroundColor: '#e3f2fd',
+                '&:hover': {
+                  backgroundColor: '#e3f2fd'
+                }
+              }
+            }}
+        >
           <ListItemAvatar>
-            <Avatar onClick={() => { handleContactClick(conversation.contactId, contact.phone) }}>{renderContactInitials(contact)}</Avatar>
+            <Avatar>{renderContactInitials(contact)}</Avatar>
           </ListItemAvatar>
+          <ListItemText
+              primary={`${contact.firstName} ${contact.lastName}`}
+              secondary={contact.phone}
+          />
         </ListItem>
     )
   }
@@ -104,7 +126,17 @@ const Conversation: React.FC = () => {
   const ChatMessage: React.FC<{ message: MessageResponse }> = ({ message }) => {
     return (
         <Box sx={{ mb: 2, textAlign: message.direction === 'OUTBOUND_API' ? 'right' : 'left' }}>
-          <Typography variant="body2" sx={{ backgroundColor: message.direction === 'OUTBOUND_API' ? '#e3f2fd' : '#f5f5f5', p: 1, borderRadius: 1, display: 'inline-block' }}>
+          <Typography
+              variant="body2"
+              sx={{
+                backgroundColor: message.direction === 'OUTBOUND_API' ? '#e3f2fd' : '#f5f5f5',
+                p: 2,
+                borderRadius: 2,
+                display: 'inline-block',
+                maxWidth: '70%',
+                wordBreak: 'break-word'
+              }}
+          >
             {message.content}
           </Typography>
         </Box>
@@ -116,49 +148,76 @@ const Conversation: React.FC = () => {
   }
 
   return (
-      <Grid container sx={{ height: '80vh' }}>
-        <Grid item xs={3} sx={{ borderRight: '1px solid #e0e0e0' }}>
-          <List sx={{ height: '100%', overflowY: 'auto' }}>
-            {conversations.map((conversation) => (
-                <ConversationItem key={conversation.contactId} conversation={conversation} />
-            ))}
-          </List>
-        </Grid>
-        <Grid item xs={8} sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-          {isLoadingMessages
-            ? (
-                  <CircularProgress />
-              )
-            : (
-                  <Box sx={{ flexGrow: 1, overflowY: 'auto', mb: 2 }}>
-                    {messages.map((message) => (
-                        <ChatMessage key={message.id} message={message} />
-                    ))}
-                  </Box>
-              )}
-          <Box sx={{ display: 'flex', mt: 'auto' }}>
-            <TextField
-                fullWidth
-                variant="outlined"
-                placeholder="Type a message"
-                value={newMessage}
-                onChange={(e) => { setNewMessage(e.target.value) }}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    void handleSendMessage()
-                  }
-                }}
-            />
-            <Button
-                variant="contained"
-                onClick={() => { void handleSendMessage() }}
-                disabled={(selectedContactPhone == null) || (newMessage.trim() === '')}
-            >
-              Send
-            </Button>
+      <MessagingLayout>
+        <Box sx={{ height: 'calc(100vh - 200px)', display: 'flex' }}>
+          <Box sx={{ width: 320, borderRight: '1px solid #e0e0e0', height: '100%' }}>
+            <Typography variant="h6" sx={{ p: 2, borderBottom: '1px solid #e0e0e0' }}>
+              Conversations
+            </Typography>
+            <List sx={{ height: 'calc(100% - 60px)', overflowY: 'auto', p: 2 }}>
+              {conversations.map((conversation) => (
+                  <ConversationItem key={conversation.contactId} conversation={conversation} />
+              ))}
+            </List>
           </Box>
-        </Grid>
-      </Grid>
+
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
+            {(selectedContactId != null)
+              ? (
+                <>
+                  <Box sx={{ p: 2, borderBottom: '1px solid #e0e0e0' }}>
+                    <Typography variant="h6">
+                      {conversations.find(c => c.contactId === selectedContactId)?.contactId}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ flex: 1, overflowY: 'auto', p: 2 }}>
+                    {isLoadingMessages
+                      ? (
+                        <CircularProgress />
+                        )
+                      : (
+                          messages.map((message) => (
+                            <ChatMessage key={message.id} message={message} />
+                          ))
+                        )}
+                  </Box>
+
+                  <Box sx={{ p: 2, borderTop: '1px solid #e0e0e0', display: 'flex', gap: 1 }}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        placeholder="Type a message"
+                        value={newMessage}
+                        onChange={(e) => { setNewMessage(e.target.value) }}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            void handleSendMessage()
+                          }
+                        }}
+                        size="small"
+                    />
+                    <Button
+                        variant="contained"
+                        onClick={() => { void handleSendMessage() }}
+                        disabled={selectedContactPhone == null || newMessage.trim() === ''}
+                    >
+                      Send
+                    </Button>
+                  </Box>
+                </>
+                )
+              : (
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                  <Typography variant="body1" color="textSecondary">
+                    Select a conversation to start messaging
+                  </Typography>
+                </Box>
+                )}
+          </Box>
+        </Box>
+      </MessagingLayout>
   )
 }
+
 export default Conversation

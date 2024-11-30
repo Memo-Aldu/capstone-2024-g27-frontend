@@ -5,6 +5,7 @@ import MessagingLayout from 'src/components/MessagingLayout'
 import QuickMessage from 'src/pages/Messaging/QuickMessage'
 import ContactManagementLayout from 'src/components/ContactManagementLayout'
 import Contacts from 'src/pages/contact/Contacts'
+import ContactsGroupes from 'src/pages/contact/ContactGroupe'
 import Conversation from 'src/pages/Messaging/Conversation'
 import Placeholder from 'src/pages/Placeholer'
 
@@ -22,7 +23,7 @@ function App (): JSX.Element {
           <Route path="/messaging/history" element={<Placeholder title="History" />} />
           <Route path="/contact-management" element={<ContactManagementLayout />} />
           <Route path="/ContactManagement/contacts" element={<Contacts />} />
-          <Route path="/ContactManagement/groupes" element={<Placeholder title="Groupes" />} />
+          <Route path="/ContactManagement/groupes" element={<ContactsGroupes/>} />
           <Route path="/messaging/conversation" element={<Conversation />} />
         </Routes>
       </Layout>
