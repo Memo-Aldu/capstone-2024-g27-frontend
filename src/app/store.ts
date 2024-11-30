@@ -1,22 +1,45 @@
-import { configureStore, type EnhancedStore } from '@reduxjs/toolkit'
-import { MessageApiSlice } from './api/MessageApiSlice'
-import { ContactApiSlice } from './api/ContactApiSlice'
-import { ConversationApiSlice } from './api/ConversationApiSlice'
+// store.ts
+import { configureStore, combineReducers } from '@reduxjs/toolkit'
+import { persistStore, persistReducer } from 'redux-persist'
+import storage from 'redux-persist/lib/storage'
+
+import { MessageApiSlice } from 'src/app/api/MessageApiSlice'
+import { ContactApiSlice } from 'src/app/api/ContactApiSlice'
+import { ConversationApiSlice } from 'src/app/api/ConversationApiSlice'
 import snackbarReducer from 'src/features/snackbar/snackbarSlice'
+import authReducer from 'src/features/auth/AuthApiSlice'
 
-export const setupStore = (preloadedState = {}): EnhancedStore =>
-  configureStore({
-    reducer: {
-      [MessageApiSlice.reducerPath]: MessageApiSlice.reducer,
-      [ContactApiSlice.reducerPath]: ContactApiSlice.reducer,
-      [ConversationApiSlice.reducerPath]: ConversationApiSlice.reducer,
-      snackbar: snackbarReducer
-    },
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(MessageApiSlice.middleware, ContactApiSlice.middleware, ConversationApiSlice.middleware),
-    preloadedState
-  })
+const authPersistConfig = {
+  key: 'auth_v2',
+  storage
+}
 
-export const store = setupStore()
+const persistedAuthReducer = persistReducer(authPersistConfig, authReducer)
 
-export type RootState = ReturnType<typeof store.getState>
+const rootReducer = combineReducers({
+  [MessageApiSlice.reducerPath]: MessageApiSlice.reducer,
+  [ContactApiSlice.reducerPath]: ContactApiSlice.reducer,
+  [ConversationApiSlice.reducerPath]: ConversationApiSlice.reducer,
+  snackbar: snackbarReducer,
+  auth: persistedAuthReducer
+})
+
+// Create the store
+export const store = configureStore({
+  reducer: rootReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE']
+      }
+    }).concat(
+      MessageApiSlice.middleware,
+      ContactApiSlice.middleware,
+      ConversationApiSlice.middleware
+    )
+})
+
+export const persistor = persistStore(store)
+
+export type RootState = ReturnType<typeof rootReducer>
 export type AppDispatch = typeof store.dispatch

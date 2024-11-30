@@ -1,7 +1,7 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import ContactMailIcon from '@mui/icons-material/ContactMail'
 import HelpIcon from '@mui/icons-material/Help'
-import HomeIcon from '@mui/icons-material/Home'
+import Dashboard from '@mui/icons-material/Dashboard'
 import MessageIcon from '@mui/icons-material/Message'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
@@ -16,13 +16,33 @@ import ListItemText from '@mui/material/ListItemText'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import { useNavigate } from 'react-router-dom'
+import { IconButton, MenuItem, MenuList, Tooltip } from '@mui/material'
+import NotificationsIcon from '@mui/icons-material/Notifications'
+import SettingsIcon from '@mui/icons-material/Settings'
+import { useState } from 'react'
+import Logout from 'src/components/Logout'
 
-const drawerWidth = 200
+const drawerWidth = 300
 
 export default function Layout (props: { children: React.ReactNode }): JSX.Element {
   const navigate = useNavigate()
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const open = Boolean(anchorEl)
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>): void => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleMenuClose = (): void => {
+    setAnchorEl(null)
+  }
+
+  const handleAccountRedirect = (event: React.MouseEvent<HTMLElement>): void => {
+    handleMenuClose()
+    navigate('/my-account')
+  }
   const menuItems1 = [
-    { name: 'Home', path: '/', icon: <HomeIcon /> },
+    { name: 'Dashboard', path: '/dashboard', icon: <Dashboard /> },
     { name: 'Contact Management', path: '/contact-management', icon: <ContactMailIcon /> },
     { name: 'Messaging', path: '/messaging', icon: <MessageIcon /> }
   ]
@@ -34,13 +54,73 @@ export default function Layout (props: { children: React.ReactNode }): JSX.Eleme
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-        <Toolbar>
-          <Typography variant="h6" noWrap component="div">
-            PharmfinderCRM
-          </Typography>
-        </Toolbar>
-      </AppBar>
+      <AppBar
+      position="fixed"
+      sx={{
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+        borderBottom: '1px solid #E0E0E0'
+      }}
+    >
+      <Toolbar sx={{ justifyContent: 'space-between' }}>
+        <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 'bold' }}>
+          PharmfinderCRM
+        </Typography>
+        {/* Right Icons */}
+        <Box>
+          <Tooltip title="Notifications">
+            <IconButton size="large" color="inherit">
+              <NotificationsIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Settings">
+            <IconButton size="large" color="inherit">
+              <SettingsIcon />
+            </IconButton>
+          </Tooltip>
+          <Box
+            onMouseEnter={handleMenuOpen}
+            onMouseLeave={handleMenuClose}
+            sx={{
+              display: 'inline-block',
+              position: 'relative'
+            }}
+          >
+            {/* User Icon Button */}
+            <IconButton
+              size="large"
+              color="inherit"
+              aria-controls={open ? 'user-menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? 'true' : undefined}
+            >
+              <AccountCircleIcon />
+            </IconButton>
+
+            {open && (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: '40px',
+                  left: 'calc(50% - 175px)',
+                  backgroundColor: '#fff',
+                  boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+                  borderRadius: '5px',
+                  zIndex: 1,
+                  minWidth: '200px'
+                }}
+              >
+                <MenuList color='grey'>
+                  <MenuItem onClick={handleAccountRedirect} sx={{ color: 'rgba(0, 0, 0, 0.87)' }}>Account Settings</MenuItem>
+                  <MenuItem onClick={handleMenuClose} sx={{ color: 'red' }}>
+                    <Logout />
+                  </MenuItem>
+                </MenuList>
+              </Box>
+            )}
+          </Box>
+        </Box>
+      </Toolbar>
+    </AppBar>
       <Drawer
         variant="permanent"
         anchor="left"

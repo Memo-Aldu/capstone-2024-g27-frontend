@@ -1,16 +1,9 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi } from '@reduxjs/toolkit/query/react'
+import { customFetchBaseQuery } from 'src/app/api/CustomFetchBaseQuery'
 
 export const ContactApiSlice = createApi({
   reducerPath: 'contactApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: process.env.REACT_APP_CONTACT_MGMT_URL ?? 'http://localhost:8081/api/v1/contacts',
-    prepareHeaders: (headers) => {
-      headers.set('Content-Type', 'application/json')
-      headers.set('Accept', 'application/json')
-      headers.set('Access-Control-Allow-Origin', '*')
-      return headers
-    }
-  }),
+  baseQuery: customFetchBaseQuery(process.env.REACT_APP_CONTACT_MGMT_URL ?? 'http://localhost:8081/api/v1/contacts'),
   tagTypes: ['Contact', 'ContactList'],
   endpoints: (builder) => ({})
 })
