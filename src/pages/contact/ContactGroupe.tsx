@@ -179,7 +179,6 @@ const ContactGroupe: FC = () => {
       }
       await deleteContactList(selectedContactListId).unwrap()
       notify('Contact list deleted successfully', 'success')
-      // Refetch and state updates will be handled by WebSocket
     } catch (error) {
       notify('Error deleting contact list', 'error')
     }
