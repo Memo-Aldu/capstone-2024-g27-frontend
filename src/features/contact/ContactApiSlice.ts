@@ -46,6 +46,20 @@ const contactApiSlice = ContactApiSlice.injectEndpoints({
         method: 'GET'
       }),
       providesTags: ['Contact']
+    }),
+    getAllContactsByContactListID: builder.query<Contact[], string>({
+      query: (id: string) => ({
+        url: `/contact-list/${id}`,
+        method: 'GET'
+      }),
+      providesTags: ['Contact']
+    }),
+    getAllContactsByUserId: builder.query<Contact[], string>({
+      query: (userId: string) => ({
+        url: `/user/${userId}`,
+        method: 'GET'
+      }),
+      providesTags: ['Contact']
     })
   })
 })
@@ -56,5 +70,7 @@ export const {
   useCreateContactMutation,
   useUpdateContactMutation,
   useDeleteContactMutation,
+  useGetAllContactsByUserIdQuery,
+  useGetAllContactsByContactListIDQuery,
   useSearchContactsByNameQuery
 } = contactApiSlice

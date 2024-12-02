@@ -8,6 +8,7 @@ import { ContactApiSlice } from 'src/app/api/ContactApiSlice'
 import { ConversationApiSlice } from 'src/app/api/ConversationApiSlice'
 import snackbarReducer from 'src/features/snackbar/snackbarSlice'
 import authReducer from 'src/features/auth/AuthApiSlice'
+import { ContactListApiSlice } from 'src/app/api/ContactListApiSlice'
 
 const authPersistConfig = {
   key: 'auth_v2',
@@ -19,6 +20,7 @@ const persistedAuthReducer = persistReducer(authPersistConfig, authReducer)
 const rootReducer = combineReducers({
   [MessageApiSlice.reducerPath]: MessageApiSlice.reducer,
   [ContactApiSlice.reducerPath]: ContactApiSlice.reducer,
+  [ContactListApiSlice.reducerPath]: ContactListApiSlice.reducer,
   [ConversationApiSlice.reducerPath]: ConversationApiSlice.reducer,
   snackbar: snackbarReducer,
   auth: persistedAuthReducer
@@ -35,6 +37,7 @@ export const store = configureStore({
     }).concat(
       MessageApiSlice.middleware,
       ContactApiSlice.middleware,
+      ContactListApiSlice.middleware,
       ConversationApiSlice.middleware
     )
 })

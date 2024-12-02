@@ -1,44 +1,45 @@
-import { ContactApiSlice } from '../../app/api/ContactApiSlice'
-import { type ContactList } from '../../types/ContactList.type'
+import { ContactListApiSlice } from '../../app/api/ContactListApiSlice'
+import { type BaseContactList } from '../../types/ContactList.type'
 
-const contactApiListSlice = ContactApiSlice.injectEndpoints({
+const contactListApiSlice = ContactListApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getContactListById: builder.query<ContactList, string>({
+    getContactListById: builder.query<BaseContactList, string>({
       query: (id: string) => ({
         url: `/${id}`,
         method: 'GET'
-      }),
-      providesTags: ['ContactList']
+      })
     }),
-    getAllContactLists: builder.query<ContactList[], void>({
+    getAllContactLists: builder.query<BaseContactList[], void>({
       query: () => ({
         url: '',
         method: 'GET'
-      }),
-      providesTags: ['ContactList']
+      })
     }),
-    createContactList: builder.mutation<ContactList, ContactList>({
-      query: (contactList: ContactList) => ({
+    getAllContactListsByUserId: builder.query<BaseContactList[], string>({
+      query: (userId: string) => ({
+        url: `/user/${userId}`,
+        method: 'GET'
+      })
+    }),
+    createContactList: builder.mutation<BaseContactList, BaseContactList>({
+      query: (contactList: BaseContactList) => ({
         url: '',
         method: 'POST',
         body: contactList
-      }),
-      invalidatesTags: ['ContactList']
+      })
     }),
-    updateContactList: builder.mutation<ContactList, ContactList>({
-      query: (contactList: ContactList) => ({
+    updateContactList: builder.mutation<BaseContactList, BaseContactList>({
+      query: (contactList: BaseContactList) => ({
         url: `/${contactList.id}`,
         method: 'PATCH',
         body: contactList
-      }),
-      invalidatesTags: ['ContactList']
+      })
     }),
     deleteContactList: builder.mutation<void, string>({
       query: (id: string) => ({
         url: `/${id}`,
         method: 'DELETE'
-      }),
-      invalidatesTags: ['ContactList']
+      })
     })
 
   })
@@ -47,7 +48,8 @@ const contactApiListSlice = ContactApiSlice.injectEndpoints({
 export const {
   useGetContactListByIdQuery,
   useGetAllContactListsQuery,
+  useGetAllContactListsByUserIdQuery,
   useCreateContactListMutation,
   useUpdateContactListMutation,
   useDeleteContactListMutation
-} = contactApiListSlice
+} = contactListApiSlice

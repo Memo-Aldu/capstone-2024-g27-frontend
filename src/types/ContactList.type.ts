@@ -1,4 +1,4 @@
-export interface ContactList {
+export interface BaseContactList {
   id: string
   listName: string
   userId: string
