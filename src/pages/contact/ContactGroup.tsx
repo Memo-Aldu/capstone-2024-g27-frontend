@@ -10,6 +10,7 @@ import { type RootState } from 'src/app/store'
 import { useSelector } from 'react-redux'
 import Sidebar from 'src/components/SideBar'
 import ContactManagementLayout from 'src/components/ContactManagementLayout'
+import Loading from 'src/components/Loading'
 
 const ContactGroup: React.FC = () => {
   const notify = useNotify()
@@ -22,8 +23,8 @@ const ContactGroup: React.FC = () => {
   const userId = user?.localAccountId ?? ''
 
   // Fetch data
-  const { data: contactListsData = [] } = useGetAllContactListsByUserIdQuery(userId)
-  const { data: contactsInList = [] } = useGetAllContactsByContactListIDQuery(selectedContactListId, { skip: selectedContactListId === '' })
+  const { data: contactListsData = [], isLoading: isLoadingGroups } = useGetAllContactListsByUserIdQuery(userId)
+  const { data: contactsInList = [], isLoading: isLoadingContacts } = useGetAllContactsByContactListIDQuery(selectedContactListId, { skip: selectedContactListId === '' })
 
   // Initialize contact lists state
   const [contactLists, setContactLists] = useState(contactListsData)
@@ -84,6 +85,14 @@ const ContactGroup: React.FC = () => {
     } catch (error) {
       notify('Error deleting contact list.', 'error')
     }
+  }
+
+  if (isLoadingContacts || isLoadingGroups) {
+    return (
+      <Box sx={{ mb: 2, textAlign: 'center', width: 'calc(90vw - 200px)' }}>
+        <Loading message={'Getting Contact Groups..'} />
+      </Box>
+    )
   }
 
   return (
