@@ -7,6 +7,7 @@ import Backdrop from '@mui/material/Backdrop'
 import Modal from '@mui/material/Modal'
 import Fade from '@mui/material/Fade'
 import { useGetAllContactsQuery } from 'src/features/contact/ContactApiSlice'
+import Loading from 'src/components/Loading'
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -21,11 +22,18 @@ const style = {
 }
 
 function Contacts (): JSX.Element {
-  const { data: contacts } = useGetAllContactsQuery()
+  const { data: contacts, isLoading: isLoadingContacts } = useGetAllContactsQuery()
   const [open, setOpen] = React.useState(false)
   const handleOpen = (): void => { setOpen(true) }
   const handleClose = (): void => { setOpen(false) }
 
+  if (isLoadingContacts) {
+    return (
+      <Box sx={{ mb: 2, textAlign: 'center', width: 'calc(90vw - 200px)' }}>
+        <Loading message={'Getting Contacts..'} description={'Please Wait 😊'} />
+      </Box>
+    )
+  }
   return (
 
       <ContactManagementLayout>

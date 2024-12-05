@@ -16,6 +16,7 @@ import { getMsalInstance } from 'src/msalConfig'
 import { useDispatch } from 'react-redux'
 import { setAuthState } from 'src/features/auth/AuthApiSlice'
 import Loading from 'src/components/Loading'
+import HistoryPage from 'src/pages/Messaging/History'
 
 const LoadingComponent = (): JSX.Element => (
   <Loading message={'Authenticating...'} description={'Please wait while we verify your credentials.'}/>
@@ -95,7 +96,7 @@ function App (): JSX.Element {
             <Route path="/messaging/campaign" element={<Placeholder title="Campaign" />} />
             <Route path="/messaging/templates" element={<Placeholder title="Templates" />} />
             <Route path="/messaging/emailToSMS" element={<Placeholder title="Email to SMS" />} />
-            <Route path="/messaging/history" element={<Placeholder title="History" />} />
+            <Route path="/messaging/history" element={<HistoryPage />} />
             <Route path="/contact-management" element={<ContactManagementLayout />} />
             <Route path="/ContactManagement/contacts" element={<Contacts />} />
             <Route path="/ContactManagement/ContactGroup" element={<ContactGroup/>} />
