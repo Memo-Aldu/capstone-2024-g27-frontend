@@ -6,7 +6,6 @@ import {
   Box,
   Button,
   FormControl,
-  IconButton,
   InputLabel,
   MenuItem,
   Select,
@@ -19,10 +18,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { useEffect, useState } from 'react'
 import MessagingLayout from '../../components/MessagingLayout'
-import { useSendMessageMutation } from '../../features/message/MessageApiSlice'
-import { type MessageRequest, type MessageResponse } from '../../types/Message.type'
-import { validatePhoneNumber } from '../../features/message/MsgHelper'
-import { useGetAllContactsQuery } from '../../features/contact/ContactApiSlice'
+import { useSendMessageMutation } from 'src/features/message/MessageApiSlice'
+import { type MessageRequest, type MessageResponse } from 'src/types/Message.type'
+import { validatePhoneNumber } from 'src/features/message/MsgHelper'
+import { useGetAllContactsQuery } from 'src/features/contact/ContactApiSlice'
 import ContactAutoComplete from 'src/components/ContactAutoComplete'
 import { type Contact } from 'src/types/Contact.type'
 import MsgConfirmationModal from 'src/components/MsgConfirmationModal'
@@ -33,8 +32,8 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import type { RootState } from 'src/app/store'
 import { UploadZone } from 'src/components/UploadZone'
-import DeleteIcon from '@mui/icons-material/Delete'
 import { ExpandMoreOutlined } from '@mui/icons-material'
+import { type Template } from 'src/types/Template.type.ts'
 
 dayjs.extend(utc)
 
@@ -193,45 +192,29 @@ function QuickMessage (): JSX.Element {
     } else throw new Error('Invalid request')
   }
 
-  const [templates, setTemplates] = useState<string[]>([])
+  const [templates, setTemplates] = useState<Template[]>([])
   const [selectedTemplate, setSelectedTemplate] = useState<string>('')
 
   useEffect(() => {
-    const storedTemplates = JSON.parse(
+    const storedTemplates: Template[] = JSON.parse(
       localStorage.getItem('MessageTemplates') ?? '[]'
-    ) as string[]
+    )
     setTemplates(storedTemplates)
   }, [])
 
   useEffect(() => {
     if (selectedTemplate !== '') {
       const selected = templates.find(
-        (template) => template === selectedTemplate
+        (template) => template.id === selectedTemplate
       )
       if (selected != null) {
-        setMessageContent(selected)
+        setMessageContent(selected.body)
       }
     }
   }, [selectedTemplate, templates])
 
-  const saveTemplate = (newTemplate: string): void => {
-    const updatedTemplates = [...templates, newTemplate]
-    setTemplates(updatedTemplates)
-    localStorage.setItem('MessageTemplates', JSON.stringify(updatedTemplates))
-  }
-
-  const deleteTemplate = (template: string): void => {
-    const updatedTemplates = templates.filter((t) => t !== template)
-    setTemplates(updatedTemplates)
-    localStorage.setItem('MessageTemplates', JSON.stringify(updatedTemplates))
-
-    if (template === selectedTemplate) {
-      setMessageContent('')
-      setSelectedTemplate('')
-    }
-  }
-
   const handleTemplateChange = (event: SelectChangeEvent<string>): void => {
+    console.log('event.target.value', event.target.value)
     setSelectedTemplate(event.target.value)
   }
 
@@ -239,17 +222,6 @@ function QuickMessage (): JSX.Element {
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
     setMessageContent(event.target.value)
-  }
-
-  const handleSaveTemplate = (): void => {
-    if (messageContent !== '') {
-      saveTemplate(messageContent)
-      setMessageContent('')
-    }
-  }
-
-  const handleDeleteTemplate = (template: string): void => {
-    deleteTemplate(template)
   }
 
   const fillTemplatePlaceholders = (template: string, recipient?: Contact): string => {
@@ -286,6 +258,7 @@ function QuickMessage (): JSX.Element {
         Quick Message
       </Typography>
       <Box
+        width='50vw'
         component="form"
         noValidate
         autoComplete="off"
@@ -347,28 +320,17 @@ function QuickMessage (): JSX.Element {
             <FormControl fullWidth>
               <InputLabel>Select Template</InputLabel>
               <Select value={selectedTemplate} onChange={handleTemplateChange}>
-                {templates.map((template: string, index: number) => (
-                  <MenuItem key={index} value={template}>
+                {templates.map((template: Template, index: number) => (
+                  <MenuItem key={index} value={template.id}>
                     <div
                       style={{ display: 'flex', justifyContent: 'space-between' }}
                     >
-                      <span>{template}</span>
-                      <IconButton
-                        color="secondary"
-                        onClick={() => {
-                          handleDeleteTemplate(template)
-                        }}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
+                      <span>{template.name}</span>
                     </div>
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
-            <Button sx={{ my: 2 }} variant="contained" onClick={handleSaveTemplate}>
-              Save Template
-            </Button>
           </AccordionDetails>
         </Accordion>
         <UploadZone

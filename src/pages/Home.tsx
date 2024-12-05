@@ -9,7 +9,7 @@ function Home (): JSX.Element {
   const navigate = useNavigate()
   return (
     <Box sx={{ flexGrow: 1, p: 3 }}>
-      <Typography variant='h5' component='h1'>Homepage</Typography>
+      <Typography variant='h4' component='h1'>Dashboard</Typography>
       <Grid container spacing={4}>
         <Grid item xs={12} md={6}>
           <Card elevation={1}>
