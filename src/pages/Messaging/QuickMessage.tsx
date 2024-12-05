@@ -23,6 +23,7 @@ import { showSnackbar } from 'src/features/snackbar/snackbarSlice'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import type { RootState } from 'src/app/store'
+import { UploadZone } from 'src/components/UploadZone'
 
 dayjs.extend(utc)
 
@@ -57,8 +58,11 @@ function QuickMessage (): JSX.Element {
     undefined
   )
 
-  const [sendSMS] = useSendMessageMutation()
+  const [sendMessage] = useSendMessageMutation()
   const { data: contacts } = useGetAllContactsQuery()
+
+  const [uploadStatus, setUploadStatus] = useState('')
+  const [files, setFiles] = useState<File[]>([])
 
   const validateMsgRequest = (): MessageRequest | undefined => {
     const newErrors: FormErrors = {
@@ -109,8 +113,18 @@ function QuickMessage (): JSX.Element {
     }
   }
 
-  const handleConfirmSend = (): void => {
+  const handleConfirmSend = async (): Promise<void> => {
     setConfirmationModalOpen(false)
+
+    const fileUrls = await uploadFiles().catch((error) => {
+      notify('Error uploading files', 'error')
+      throw error
+    })
+
+    if (fileUrls != null && fileUrls.length > 0 && msgRequest != null) {
+      msgRequest.media = fileUrls
+    }
+
     handleMsgRequest(msgRequest)
       .then((response) => {
         notify(`Message sent to ${recipients.length} recipients`, 'success')
@@ -121,9 +135,49 @@ function QuickMessage (): JSX.Element {
       })
   }
 
+  const uploadToCloudinary = async (file: File): Promise<string | undefined> => {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('upload_preset', 'MMSAttachment')
+
+    setUploadStatus('uploading')
+    try {
+      const response = await fetch(
+        'https://api.cloudinary.com/v1_1/dcf7wnrsh/upload',
+        {
+          method: 'POST',
+          body: formData
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error(`Failed to upload: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      return data.secure_url
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error uploading file:', error)
+    } finally {
+      setUploadStatus('')
+    }
+  }
+
+  const uploadFiles = async (): Promise<string[]> => {
+    const urls = []
+    for (const file of files) {
+      const url = await uploadToCloudinary(file)
+      if (url != null) {
+        urls.push(url)
+      }
+    }
+    return urls
+  }
+
   const handleMsgRequest = async (request?: MessageRequest): Promise<MessageResponse> => {
     if (request != null) {
-      const result = await sendSMS(request).unwrap()
+      const result = await sendMessage(request).unwrap()
       return result
     } else throw new Error('Invalid request')
   }
@@ -131,7 +185,7 @@ function QuickMessage (): JSX.Element {
   return (
     <MessagingLayout>
       <Typography variant="h4" component="h1" gutterBottom>
-        Quick SMS
+        Quick Message
       </Typography>
       <Box
         component="form"
@@ -189,6 +243,7 @@ function QuickMessage (): JSX.Element {
             )
           }}
         />
+        <UploadZone uploadStatus={uploadStatus} setUploadStatus={setUploadStatus} files={files} setFiles={setFiles} />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateTimePicker
             label="Schedule Date & Time"
