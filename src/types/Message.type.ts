@@ -34,14 +34,7 @@ export interface MessageResponse {
   status: string
   content: string
   media: string[]
-  currency: {
-    currencyCode: string
-    displayName: string
-    symbol: string
-    defaultFractionDigits: number
-    numericCode: number
-    numericCodeAsString: string
-  }
+  currency: string
   direction: string
   type: string
   scheduledDate: string
