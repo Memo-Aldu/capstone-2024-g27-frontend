@@ -1,9 +1,9 @@
-import { ConversationApiSlice } from '../../app/api/ConversationApiSlice'
-import { type Conversations, type BaseConversation } from '../../types/Conversation.type'
+import { ConversationApiSlice } from 'src/app/api/ConversationApiSlice'
+import { type Conversations, type BaseConversation, type ConversationResponse } from 'src/types/Conversation.type'
 
 const conversationApiSlice = ConversationApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getConversations: builder.query<Conversations[], void>({
+    getConversations: builder.query<Conversations, void>({
       query: () => ''
     }),
     getConversationById: builder.query<BaseConversation, string>({
@@ -17,14 +17,14 @@ const conversationApiSlice = ConversationApiSlice.injectEndpoints({
         params: { page, size, sortBy, order }
       })
     }),
-    createConversation: builder.mutation<BaseConversation, Partial<BaseConversation>>({
+    createConversation: builder.mutation<ConversationResponse, Partial<BaseConversation>>({
       query: (conversation) => ({
         url: '',
         method: 'POST',
         body: conversation
       })
     }),
-    updateConversation: builder.mutation<BaseConversation, { id: string, conversation: Partial<BaseConversation> }>({
+    updateConversation: builder.mutation<ConversationResponse, { id: string, conversation: Partial<BaseConversation> }>({
       query: ({ id, conversation }) => ({
         url: `${id}`,
         method: 'PATCH',

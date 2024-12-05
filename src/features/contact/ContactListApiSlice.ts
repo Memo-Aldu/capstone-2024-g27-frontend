@@ -1,5 +1,5 @@
-import { ContactListApiSlice } from '../../app/api/ContactListApiSlice'
-import { type BaseContactList } from '../../types/ContactList.type'
+import { ContactListApiSlice } from 'src/app/api/ContactListApiSlice'
+import { type BaseContactList } from 'src/types/ContactList.type'
 
 const contactListApiSlice = ContactListApiSlice.injectEndpoints({
   endpoints: (builder) => ({

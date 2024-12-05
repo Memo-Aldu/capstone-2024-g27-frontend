@@ -2,7 +2,12 @@ import React from 'react'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 
-const Loading = (): JSX.Element => {
+interface LoadingProps {
+  message: string
+  description?: string
+}
+
+const Loading = ({ message, description }: LoadingProps): JSX.Element => {
   return (
     <Box
       sx={{
@@ -20,9 +25,9 @@ const Loading = (): JSX.Element => {
         thickness={4.5}
         sx={{ color: '#1976d2', marginBottom: '16px' }}
       />
-      <h1 style={{ fontSize: '1.5rem', color: '#555' }}>Authenticating...</h1>
+      <h1 style={{ fontSize: '1.5rem', color: '#555' }}>{message}</h1>
       <p style={{ fontSize: '1rem', color: '#888' }}>
-        Please wait while we verify your credentials.
+        {description}
       </p>
     </Box>
   )

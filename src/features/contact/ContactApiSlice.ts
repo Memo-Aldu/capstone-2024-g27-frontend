@@ -1,5 +1,5 @@
-import { ContactApiSlice } from '../../app/api/ContactApiSlice'
-import { type BaseContact, type Contact } from '../../types/Contact.type'
+import { ContactApiSlice } from 'src/app/api/ContactApiSlice'
+import { type BaseContact, type Contact } from 'src/types/Contact.type'
 
 const contactApiSlice = ContactApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -60,6 +60,14 @@ const contactApiSlice = ContactApiSlice.injectEndpoints({
         method: 'GET'
       }),
       providesTags: ['Contact']
+    }),
+    removeContactFromList: builder.mutation<Contact, string>({
+      query: (id: string) => ({
+        url: `/contact-list/${id}`,
+        method: 'PATCH',
+        body: JSON.stringify({ contactListId: '' })
+      }),
+      invalidatesTags: ['Contact']
     })
   })
 })
@@ -69,6 +77,7 @@ export const {
   useGetAllContactsQuery,
   useCreateContactMutation,
   useUpdateContactMutation,
+  useRemoveContactFromListMutation,
   useDeleteContactMutation,
   useGetAllContactsByUserIdQuery,
   useGetAllContactsByContactListIDQuery,

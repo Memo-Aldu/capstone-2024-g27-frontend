@@ -1,23 +1,16 @@
 import React, { type FC, useState } from 'react'
-import { Button, TextField, Box, Typography, Switch } from '@mui/material'
-import { type BaseContact } from 'src/types/Contact.type'
+import { Button, TextField, Box, Typography, Switch, Grid } from '@mui/material'
+import { useNotify } from 'src/utils/notify'
 import { useCreateContactMutation } from 'src/features/contact/ContactApiSlice'
-import { showSnackbar } from 'src/features/snackbar/snackbarSlice'
-import { useDispatch } from 'react-redux'
+import { type BaseContact } from 'src/types/Contact.type'
 
 interface ContactFormProps {
   onClose: () => void
 }
 
 const ContactForm: FC<ContactFormProps> = ({ onClose }) => {
-  const dispatch = useDispatch()
-  const notify = (
-    message: string,
-    severity: 'success' | 'error' | 'warning' | 'info'
-  ): void => {
-    dispatch(showSnackbar({ message, severity }))
-  }
-
+  const notify = useNotify()
+  const [createContact] = useCreateContactMutation()
   const [contact, setContact] = useState<BaseContact>({
     contactListId: '',
     firstName: '',
@@ -29,8 +22,8 @@ const ContactForm: FC<ContactFormProps> = ({ onClose }) => {
     addressId: '',
     doNotContact: false
   })
-  const [createContact] = useCreateContactMutation()
 
+  // Handles input changes for all text fields
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = event.target
     setContact((prevState) => ({
@@ -39,94 +32,132 @@ const ContactForm: FC<ContactFormProps> = ({ onClose }) => {
     }))
   }
 
+  // Handles changes for the switch toggle
+  const handleSwitchChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    const { checked } = event.target
+    setContact((prevState) => ({
+      ...prevState,
+      doNotContact: checked
+    }))
+  }
+
   const handleOnSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
-    createContact(contact).unwrap().then((response) => {
-      notify('Contact created', 'success')
+    void submitContact()
+  }
+
+  // Submits the contact asynchronously
+  const submitContact = async (): Promise<void> => {
+    try {
+      await createContact(contact).unwrap()
+      notify('Contact created successfully!', 'success')
       onClose()
-    }).catch((error) => {
+    } catch (error) {
       notify('Error creating contact', 'error')
-      throw error
-    })
+      console.error(error)
+    }
   }
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}
-    >
-      <Box component={'form'}
-        onSubmit={handleOnSubmit}
-        sx={{ maxWidth: 600, mx: 'auto', p: 2 }}>
-        <Typography variant="h4" align="center" mb={2}>
-          Add a contact
+    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', p: 2 }}>
+      <Box
+        component="form"
+        onSubmit={ handleOnSubmit }
+        sx={{
+          maxWidth: 600,
+          width: '100%',
+          backgroundColor: 'background.paper',
+          boxShadow: 3,
+          borderRadius: 2,
+          p: 3
+        }}
+      >
+        <Typography variant="h4" align="center" gutterBottom>
+          Add a Contact
         </Typography>
-          <TextField
-            fullWidth
-            label="First Name"
-            value={contact.firstName}
-            onChange={handleOnChange}
-            margin="normal"
-            name="firstName"
-          />
-          <TextField
-            fullWidth
-            label="Last Name"
-            value={contact.lastName}
-            onChange={handleOnChange}
-            margin="normal"
-            name = "lastName"
-          />
-          <TextField
-            fullWidth
-            label="Preferred Name"
-            value={contact.preferredName}
-            onChange={handleOnChange}
-            margin="normal"
-            name = "preferredName"
-          />
-          <TextField
-            fullWidth
-            label="email"
-            value={contact.email}
-            onChange={handleOnChange}
-            margin="normal"
-            name = "email"
-          />
-          <TextField
-            fullWidth
-            label="phone"
-            value={contact.phone}
-            onChange={handleOnChange}
-            margin="normal"
-            name = "phone"
-          />
-          <TextField
-            fullWidth
-            label="fax"
-            value={contact.fax}
-            onChange={handleOnChange}
-            margin="normal"
-            name = "fax"
-          />
-          <Box>
-            <Typography variant='body1'>Do Not Contact</Typography>
-            <Switch
-              checked={contact.doNotContact}
-              onChange={(e) => {
-                setContact((prevState) => ({
-                  ...prevState,
-                  doNotContact: e.target.checked
-                }))
-              }}
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              name="firstName"
+              label="First Name"
+              value={contact.firstName}
+              onChange={handleOnChange}
+              variant="outlined"
+              margin="normal"
             />
-          </Box>
-          <Button variant='contained' type='submit' className='submit-btn'>
-            Add Contact
-          </Button>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              name="lastName"
+              label="Last Name"
+              value={contact.lastName}
+              onChange={handleOnChange}
+              variant="outlined"
+              margin="normal"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              name="preferredName"
+              label="Preferred Name"
+              value={contact.preferredName}
+              onChange={handleOnChange}
+              variant="outlined"
+              margin="normal"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              name="email"
+              label="Email"
+              value={contact.email}
+              onChange={handleOnChange}
+              variant="outlined"
+              margin="normal"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              name="phone"
+              label="Phone"
+              value={contact.phone}
+              onChange={handleOnChange}
+              variant="outlined"
+              margin="normal"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              name="fax"
+              label="Fax"
+              value={contact.fax}
+              onChange={handleOnChange}
+              variant="outlined"
+              margin="normal"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Typography variant="body1">Do Not Contact</Typography>
+              <Switch
+                checked={contact.doNotContact}
+                onChange={handleSwitchChange}
+                name="doNotContact"
+              />
+            </Box>
+          </Grid>
+          <Grid item xs={12}>
+            <Button fullWidth variant="contained" color="primary" type="submit">
+              Add Contact
+            </Button>
+          </Grid>
+        </Grid>
       </Box>
     </Box>
   )

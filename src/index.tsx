@@ -16,7 +16,7 @@ root.render(
     <React.StrictMode>
       <Provider store={store}>
         <PersistGate
-          loading={ <Loading/> }
+          loading={ <Loading message={'Authenticating...'} description={'Please wait while we verify your credentials.'}/> }
           persistor={persistor}
           onBeforeLift={() => {
             console.log('PersistGate has rehydrated the state.');
