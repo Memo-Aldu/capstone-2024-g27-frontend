@@ -44,7 +44,7 @@
         "react/react-in-jsx-scope": "off",
         "react/jsx-uses-react": "off",
         "react/prop-types": "off",
-        "no-console": 2,
+        "no-console": 0,
         "@typescript-eslint/no-invalid-void-type": 0,
         "@typescript-eslint/no-misused-promises": [
             "error",
