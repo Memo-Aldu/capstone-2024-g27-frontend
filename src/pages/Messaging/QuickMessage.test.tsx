@@ -20,14 +20,7 @@ const mockResponse: MessageResponse = {
   status: 'sent',
   content: 'Test message content',
   media: [],
-  currency: {
-    currencyCode: 'USD',
-    displayName: 'US Dollar',
-    symbol: '$',
-    defaultFractionDigits: 2,
-    numericCode: 840,
-    numericCodeAsString: '840'
-  },
+  currency: 'USD',
   direction: 'outbound',
   type: 'sms',
   scheduledDate: '2022-01-01T00:00:00.000Z',

@@ -45,7 +45,6 @@ const modalStyle = {
   p: 4
 }
 
-// fonction pour s'occuper de la pagination
 function TablePaginationActions (props: TablePaginationActionsProps): JSX.Element {
   const theme = useTheme()
   const { count, page, rowsPerPage, onPageChange } = props
