@@ -63,7 +63,7 @@ const contactApiSlice = ContactApiSlice.injectEndpoints({
     }),
     removeContactFromList: builder.mutation<Contact, string>({
       query: (id: string) => ({
-        url: `/contact-list/${id}`,
+        url: `/${id}`,
         method: 'PATCH',
         body: JSON.stringify({ contactListId: '' })
       }),
