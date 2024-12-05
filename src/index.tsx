@@ -18,9 +18,7 @@ root.render(
         <PersistGate
           loading={ <Loading message={'Authenticating...'} description={'Please wait while we verify your credentials.'}/> }
           persistor={persistor}
-          onBeforeLift={() => {
-            console.log('PersistGate has rehydrated the state.');
-          }}
+          onBeforeLift={() => {}}
         >
           <MsalProvider instance={getMsalInstance()}>
             <App />

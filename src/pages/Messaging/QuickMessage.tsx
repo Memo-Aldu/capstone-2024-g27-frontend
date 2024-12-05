@@ -122,8 +122,6 @@ function QuickMessage (): JSX.Element {
       }
     })
 
-    console.log(allRecipients)
-
     setErrors(newErrors)
     if (Object.values(newErrors).every((error) => error === '')) {
       return {
@@ -239,7 +237,6 @@ function QuickMessage (): JSX.Element {
   }, [selectedTemplate, templates])
 
   const handleTemplateChange = (event: SelectChangeEvent<string>): void => {
-    console.log('event.target.value', event.target.value)
     setSelectedTemplate(event.target.value)
   }
 
