@@ -1,14 +1,23 @@
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Autocomplete,
   Box,
   Button,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
   TextField,
-  Typography
+  Typography,
+  type SelectChangeEvent
 } from '@mui/material'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import MessagingLayout from '../../components/MessagingLayout'
 import { useSendMessageMutation } from '../../features/message/MessageApiSlice'
 import { type MessageRequest, type MessageResponse } from '../../types/Message.type'
@@ -24,6 +33,8 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import type { RootState } from 'src/app/store'
 import { UploadZone } from 'src/components/UploadZone'
+import DeleteIcon from '@mui/icons-material/Delete'
+import { ExpandMoreOutlined } from '@mui/icons-material'
 
 dayjs.extend(utc)
 
@@ -95,7 +106,7 @@ function QuickMessage (): JSX.Element {
         userId,
         from: sender,
         messageItems: recipients.map((recipient) => ({
-          content: messageContent,
+          content: fillTemplatePlaceholders(messageContent, recipient),
           contactId: recipient.id,
           to: recipient.phone
         })),
@@ -182,6 +193,93 @@ function QuickMessage (): JSX.Element {
     } else throw new Error('Invalid request')
   }
 
+  const [templates, setTemplates] = useState<string[]>([])
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('')
+
+  useEffect(() => {
+    const storedTemplates = JSON.parse(
+      localStorage.getItem('MessageTemplates') ?? '[]'
+    ) as string[]
+    setTemplates(storedTemplates)
+  }, [])
+
+  useEffect(() => {
+    if (selectedTemplate !== '') {
+      const selected = templates.find(
+        (template) => template === selectedTemplate
+      )
+      if (selected != null) {
+        setMessageContent(selected)
+      }
+    }
+  }, [selectedTemplate, templates])
+
+  const saveTemplate = (newTemplate: string): void => {
+    const updatedTemplates = [...templates, newTemplate]
+    setTemplates(updatedTemplates)
+    localStorage.setItem('MessageTemplates', JSON.stringify(updatedTemplates))
+  }
+
+  const deleteTemplate = (template: string): void => {
+    const updatedTemplates = templates.filter((t) => t !== template)
+    setTemplates(updatedTemplates)
+    localStorage.setItem('MessageTemplates', JSON.stringify(updatedTemplates))
+
+    if (template === selectedTemplate) {
+      setMessageContent('')
+      setSelectedTemplate('')
+    }
+  }
+
+  const handleTemplateChange = (event: SelectChangeEvent<string>): void => {
+    setSelectedTemplate(event.target.value)
+  }
+
+  const handleMessageChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    setMessageContent(event.target.value)
+  }
+
+  const handleSaveTemplate = (): void => {
+    if (messageContent !== '') {
+      saveTemplate(messageContent)
+      setMessageContent('')
+    }
+  }
+
+  const handleDeleteTemplate = (template: string): void => {
+    deleteTemplate(template)
+  }
+
+  const fillTemplatePlaceholders = (template: string, recipient?: Contact): string => {
+    console.log('template', template)
+    const replaceInTemplate = (template: string, obj: Record<string, string | number> | Contact): string => {
+      for (const [key, value] of Object.entries(obj)) {
+        console.log(key, value)
+        template = template.replace(`{{${key}}}`, String(value))
+      }
+      return template
+    }
+
+    const placeholders = {
+      Date: new Date().toLocaleDateString(),
+      Day: new Date().toLocaleDateString('en-US', { weekday: 'long' }),
+      Month: new Date().toLocaleDateString('en-US', { month: 'long' }),
+      Year: new Date().getFullYear(),
+      AppVersion: '1.0.0',
+      SupportEmail: 'support@messagingapp.com',
+      RandomNumber: Math.floor(Math.random() * 100)
+    }
+    template = replaceInTemplate(template, placeholders)
+
+    if (recipient != null) {
+      template = replaceInTemplate(template, recipient)
+    }
+
+    return template
+  }
+
   return (
     <MessagingLayout>
       <Typography variant="h4" component="h1" gutterBottom>
@@ -230,9 +328,7 @@ function QuickMessage (): JSX.Element {
           multiline
           rows={4}
           value={messageContent}
-          onChange={(e) => {
-            setMessageContent(e.target.value)
-          }}
+          onChange={handleMessageChange}
           error={errors.messageError !== ''}
           helperText={errors.messageError}
           InputProps={{
@@ -243,7 +339,44 @@ function QuickMessage (): JSX.Element {
             )
           }}
         />
-        <UploadZone uploadStatus={uploadStatus} setUploadStatus={setUploadStatus} files={files} setFiles={setFiles} />
+        <Accordion sx={{ my: 2 }}>
+          <AccordionSummary expandIcon={<ExpandMoreOutlined />}>
+            <Typography>Templates</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <FormControl fullWidth>
+              <InputLabel>Select Template</InputLabel>
+              <Select value={selectedTemplate} onChange={handleTemplateChange}>
+                {templates.map((template: string, index: number) => (
+                  <MenuItem key={index} value={template}>
+                    <div
+                      style={{ display: 'flex', justifyContent: 'space-between' }}
+                    >
+                      <span>{template}</span>
+                      <IconButton
+                        color="secondary"
+                        onClick={() => {
+                          handleDeleteTemplate(template)
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </div>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Button sx={{ my: 2 }} variant="contained" onClick={handleSaveTemplate}>
+              Save Template
+            </Button>
+          </AccordionDetails>
+        </Accordion>
+        <UploadZone
+          uploadStatus={uploadStatus}
+          setUploadStatus={setUploadStatus}
+          files={files}
+          setFiles={setFiles}
+        />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateTimePicker
             label="Schedule Date & Time"
