@@ -190,8 +190,7 @@ function QuickMessage (): JSX.Element {
       const data = await response.json()
       return data.secure_url
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error uploading file:', error)
+      notify('Failed to upload file', 'error')
     } finally {
       setUploadStatus('')
     }

@@ -73,7 +73,6 @@ const Conversation: React.FC = () => {
         setIsModalOpen(false)
         notify('Conversation created successfully!', 'success')
       } catch (error: any) {
-        console.error('Error creating conversation:', error)
         if (error?.status === 409) {
           notify('Conversation already exists', 'warning')
         } else {
@@ -114,7 +113,6 @@ const Conversation: React.FC = () => {
         notify('Message sent successfully!', 'success')
         void refetchMessages()
       } catch (error) {
-        console.error('Error sending message:', error)
         notify('Error sending message', 'error')
       }
     }
