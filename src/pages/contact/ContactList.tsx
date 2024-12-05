@@ -1,4 +1,4 @@
-import React, { type FC } from 'react'
+import React, { type FC, useState } from 'react'
 import { useTheme } from '@mui/material/styles'
 import Box from '@mui/material/Box'
 import Table from '@mui/material/Table'
@@ -14,12 +14,13 @@ import FirstPageIcon from '@mui/icons-material/FirstPage'
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight'
 import LastPageIcon from '@mui/icons-material/LastPage'
-import { TableHead } from '@mui/material'
+import { TableHead, Button, Modal, Fade } from '@mui/material'
 import { AiFillDelete, AiFillEdit } from 'react-icons/ai'
 import { type Contact } from 'src/types/Contact.type'
 import { useDeleteContactMutation } from 'src/features/contact/ContactApiSlice'
-import { useDispatch } from 'react-redux'
-import { showSnackbar } from 'src/features/snackbar/snackbarSlice'
+import ContactUpdateForm from 'src/pages/contact/ContactUpdateForm'
+import { useNotify } from 'src/utils/notify'
+import ContactGroupForm from 'src/pages/contact/ContactGroupForm'
 
 interface ContactListProps {
   contacts?: Contact[]
@@ -29,10 +30,19 @@ interface TablePaginationActionsProps {
   count: number
   page: number
   rowsPerPage: number
-  onPageChange: (
-    event: React.MouseEvent<HTMLButtonElement>,
-    newPage: number,
-  ) => void
+  onPageChange: (event: React.MouseEvent<HTMLButtonElement>, newPage: number) => void
+}
+
+const modalStyle = {
+  position: 'absolute' as const,
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4
 }
 
 // fonction pour s'occuper de la pagination
@@ -59,7 +69,7 @@ function TablePaginationActions (props: TablePaginationActionsProps): JSX.Elemen
   }
 
   return (
-    <Box sx={{ flexShrink: 0, ml: 2.5 }}>
+    <Box sx={{ flexShrink: 0, ml: 2.5, align: 'center' }}>
       <IconButton
         onClick={handleFirstPageButtonClick}
         disabled={page === 0}
@@ -91,24 +101,27 @@ function TablePaginationActions (props: TablePaginationActionsProps): JSX.Elemen
     </Box>
   )
 }
-// fin fonction pour s'occuper de la pagination
 
-// debut fonction principale List de contact
 const ContactList: FC<ContactListProps> = ({ contacts }) => {
-  const dispatch = useDispatch()
-  const notify = (
-    message: string,
-    severity: 'success' | 'error' | 'warning' | 'info'
-  ): void => {
-    dispatch(showSnackbar({ message, severity }))
+  const notify = useNotify()
+
+  const [openUpdateModal, setOpenUpdateModal] = useState(false)
+  const [openGroupModal, setOpenGroupModal] = useState(false)
+  const [updateContact, setUpdateContact] = useState<Contact | null>(null)
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(5)
+
+  const [deleteContact] = useDeleteContactMutation()
+
+  const handleDeleteContact = (id: string): void => {
+    deleteContact(id)
+      .unwrap()
+      .then(() => { notify('Contact deleted', 'success') })
+      .catch((error) => {
+        notify('Error deleting contact', 'error')
+        throw error
+      })
   }
-
-  const [page, setPage] = React.useState(0)
-  const [rowsPerPage, setRowsPerPage] = React.useState(5)
-
-  // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - (contacts?.length ?? 0)) : 0
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -117,87 +130,83 @@ const ContactList: FC<ContactListProps> = ({ contacts }) => {
     setPage(newPage)
   }
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ): void => {
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setRowsPerPage(parseInt(event.target.value, 10))
     setPage(0)
   }
 
-  const [deleteContact] = useDeleteContactMutation()
-
-  const handleDeleteContact = (id: string): void => {
-    deleteContact(id).unwrap().then(() => {
-      notify('Contact deleted', 'success')
-    }).catch((error) => {
-      notify('Error deleting contact', 'error')
-      throw error
-    })
-  }
-
   const handleUpdateContact = (contact: Contact): void => {
-    // eslint-disable-next-line no-console
-    console.log('Update contact', contact)
-    // TODO
+    setUpdateContact(contact)
+    setOpenUpdateModal(true)
   }
+
+  const handleAddToGroup = (contact: Contact): void => {
+    setUpdateContact(contact)
+    setOpenGroupModal(true)
+  }
+
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - (contacts?.length ?? 0)) : 0
 
   return (
-    <div className='contacts-list'>
-      <h3 className='contacts-list-title'>List of Contacts</h3>
-      <div className='contacts-list-table-container'>
-
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
-
-            <TableHead>
-                <TableRow>
-                  <TableCell>First Name</TableCell>
-                  <TableCell>Last Name</TableCell>
-                  <TableCell>Email Adress</TableCell>
-                  <TableCell>Phone Number</TableCell>
-                  <TableCell>edit</TableCell>
-                  <TableCell>delete</TableCell>
-                </TableRow>
-              </TableHead>
-
-            {contacts !== undefined && (
-              <TableBody>
-              {(rowsPerPage > 0
-                ? contacts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                : contacts
-              ).map((contact, index) => (
-                <TableRow key={index}>
-                  <TableCell component="th">
-                      {contact.firstName}
-                  </TableCell>
-                  <TableCell component="th">
-                      {contact.lastName}
-                  </TableCell>
-                  <TableCell>
-                      {contact.email}
-                  </TableCell>
-                  <TableCell>
-                      {contact.phone}
-                  </TableCell>
-                  <TableCell>
-                    <AiFillEdit size={20} className='icon' onClick={() => { handleUpdateContact(contact) } } />
-                  </TableCell>
-                  <TableCell>
-                    <AiFillDelete size={20} className='icon' onClick={() => { handleDeleteContact(contact.id) }} />
-                  </TableCell>
+    <Box sx={{ p: 3 }}>
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 500 }} aria-label='contacts table'>
+          <TableHead>
+            <TableRow>
+              <TableCell align="center">First Name</TableCell>
+              <TableCell align="center">Last Name</TableCell>
+              <TableCell align="center">Email</TableCell>
+              <TableCell align="center">Phone</TableCell>
+              <TableCell align="center">Edit</TableCell>
+              <TableCell align="center">Delete</TableCell>
+              <TableCell align="center">Add to Group</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {(rowsPerPage > 0
+              ? contacts?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : contacts
+            )?.map((contact) => (
+              <TableRow key={contact.id}>
+                <TableCell align="center">{contact.firstName}</TableCell>
+                <TableCell align="center">{contact.lastName}</TableCell>
+                <TableCell align="center">{contact.email}</TableCell>
+                <TableCell align="center">{contact.phone}</TableCell>
+                <TableCell align="center">
+                  <AiFillEdit
+                    size={20}
+                    onClick={() => { handleUpdateContact(contact) }}
+                    style={{ cursor: 'pointer' }}
+                  />
+                </TableCell>
+                <TableCell align="center">
+                  <AiFillDelete
+                    size={20}
+                    onClick={() => { handleDeleteContact(contact.id) }}
+                    style={{ cursor: 'pointer' }}
+                  />
+                </TableCell>
+                <TableCell align="center">
+                  <Button
+                    variant='contained'
+                    size='small'
+                    onClick={() => { handleAddToGroup(contact) }}
+                  >
+                    Add to Group
+                  </Button>
+                </TableCell>
               </TableRow>
-              ))}
-
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 53 * emptyRows }}>
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>)
-            }
-
-            <TableFooter>
-              <TableRow>
+            ))}
+            {emptyRows > 0 && (
+              <TableRow style={{ height: 53 * emptyRows }}>
+                <TableCell colSpan={7} />
+              </TableRow>
+            )}
+          </TableBody>
+          <TableFooter sx={{ align: 'center' }}>
+            <TableRow sx={{ align: 'center' }}>
+              <TableCell colSpan={7} align="center">
                 <TablePagination
                   rowsPerPageOptions={[5, 15, 25, { label: 'All', value: -1 }]}
                   colSpan={3}
@@ -216,13 +225,46 @@ const ContactList: FC<ContactListProps> = ({ contacts }) => {
                   onRowsPerPageChange={handleChangeRowsPerPage}
                   ActionsComponent={TablePaginationActions}
                 />
-              </TableRow>
-            </TableFooter>
-          </Table>
-        </TableContainer>
+              </TableCell>
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </TableContainer>
 
-      </div>
-    </div>
+      {/* Update Contact Modal */}
+      <Modal
+        open={openUpdateModal}
+        onClose={() => { setOpenUpdateModal(false) }}
+        closeAfterTransition
+      >
+        <Fade in={openUpdateModal}>
+          <Box sx={modalStyle}>
+            {(updateContact != null) && (
+              <ContactUpdateForm
+                contact={updateContact}
+                onClose={() => { setOpenUpdateModal(false) }}
+              />
+            )}
+          </Box>
+        </Fade>
+      </Modal>
+
+      {/* Add to Group Modal */}
+      <Modal
+        open={openGroupModal}
+        onClose={() => { setOpenGroupModal(false) }}
+        closeAfterTransition
+      >
+        <Fade in={openGroupModal}>
+          <Box sx={modalStyle}>
+            {(updateContact != null) && (
+              <ContactGroupForm contact={updateContact} onClose={() => { setOpenGroupModal(false) }} />
+            )}
+          </Box>
+        </Fade>
+      </Modal>
+    </Box>
   )
 }
+
 export default ContactList

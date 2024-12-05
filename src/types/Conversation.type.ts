@@ -10,6 +10,13 @@ export interface Conversations {
   totalElements: number
 }
 
+export interface ConversationResponse {
+  httpStatus: string
+  responseStatus: string
+  responseMessage: string
+  data: BaseConversation
+}
+
 export interface BaseConversation {
   id: string
   userId: string

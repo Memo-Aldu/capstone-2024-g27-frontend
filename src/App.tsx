@@ -5,6 +5,7 @@ import MessagingLayout from 'src/components/MessagingLayout'
 import QuickMessage from 'src/pages/Messaging/QuickMessage'
 import ContactManagementLayout from 'src/components/ContactManagementLayout'
 import Contacts from 'src/pages/contact/Contacts'
+import ContactGroup from 'src/pages/contact/ContactGroup'
 import Conversation from 'src/pages/Messaging/Conversation'
 import Placeholder from 'src/pages/Placeholer'
 import Account from 'src/pages/Account'
@@ -17,7 +18,7 @@ import { setAuthState } from 'src/features/auth/AuthApiSlice'
 import Loading from 'src/components/Loading'
 
 const LoadingComponent = (): JSX.Element => (
-  <Loading />
+  <Loading message={'Authenticating...'} description={'Please wait while we verify your credentials.'}/>
 )
 const ErrorComponent = ({ error }: { error: any }): JSX.Element => (
   <div>
@@ -97,7 +98,7 @@ function App (): JSX.Element {
             <Route path="/messaging/history" element={<Placeholder title="History" />} />
             <Route path="/contact-management" element={<ContactManagementLayout />} />
             <Route path="/ContactManagement/contacts" element={<Contacts />} />
-            <Route path="/ContactManagement/groupes" element={<Placeholder title="Groupes" />} />
+            <Route path="/ContactManagement/ContactGroup" element={<ContactGroup/>} />
             <Route path="/messaging/conversation" element={<Conversation />} />
             <Route path="/my-account" element={<Account title={'Account Details'} />} />
           </Routes>
