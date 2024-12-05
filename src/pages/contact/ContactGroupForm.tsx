@@ -32,12 +32,10 @@ const ContactGroupForm: FC<ContactGroupFormProps> = ({ contact, onClose }) => {
   const [selectedGroup, setSelectedGroup] = useState<string>('')
 
   const handleGroupChange = (event: SelectChangeEvent<unknown>): void => {
-    console.log('event.target.value', event.target.value)
     setSelectedGroup(event.target.value as string)
   }
 
   const handleSave = async (): Promise<void> => {
-    console.log('selectedGroup', selectedGroup)
     if (selectedGroup === '') {
       notify('Please select a group', 'warning')
       return

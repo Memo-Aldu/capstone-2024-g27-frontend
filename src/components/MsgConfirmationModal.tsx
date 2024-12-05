@@ -1,4 +1,4 @@
-import { Box, Button, Modal, Typography } from '@mui/material'
+import { Box, Button, Modal, Typography, Divider } from '@mui/material'
 import { type MessageRequest } from 'src/types/Message.type'
 
 interface MsgConfirmationModalProps {
@@ -10,39 +10,72 @@ interface MsgConfirmationModalProps {
 
 const MsgConfirmationModal = ({ open, setOpen, msgRequest, handleConfirmSend }: MsgConfirmationModalProps): JSX.Element => {
   return (
-    <Modal open={open}>
+    <Modal open={open} onClose={() => { setOpen(false) }}>
       <Box
         sx={{
           position: 'absolute',
           top: '50%',
           left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: { xs: '90%', sm: '400px' },
           bgcolor: 'background.paper',
-          border: '2px solid #000',
+          borderRadius: 2,
           boxShadow: 24,
-          p: 4
+          p: 3,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2
         }}
       >
-        <Typography variant="h4">Confirm Message</Typography>
-        <Typography variant="body1">
-          Recipient: {msgRequest?.messageItems.map((item) => item.to).join(', ')}
+        <Typography variant="h5" fontWeight="bold" gutterBottom>
+          Confirm Message
         </Typography>
-        <Typography variant="body1">From: {msgRequest?.from}</Typography>
-        <Typography variant="body1">
-          Message: {msgRequest?.messageItems[0].content}
-        </Typography>
-        <Button
-          variant="contained"
-          color="warning"
-          sx={{ mr: 2 }}
-          onClick={() => {
-            setOpen(false)
-          }}
-        >
-          Cancel
-        </Button>
-        <Button variant="contained" color='primary' onClick={handleConfirmSend} data-testid="confirm-send-btn">
-          Confirm Send
-        </Button>
+        <Divider />
+
+        <Box>
+          <Typography variant="subtitle1" color="text.secondary">
+            Recipient:
+          </Typography>
+          <Typography variant="body1" sx={{ wordBreak: 'break-word' }}>
+            {msgRequest?.messageItems.map((item) => item.to).join(', ')}
+          </Typography>
+        </Box>
+
+        <Box>
+          <Typography variant="subtitle1" color="text.secondary">
+            From:
+          </Typography>
+          <Typography variant="body1">{msgRequest?.from}</Typography>
+        </Box>
+
+        <Box>
+          <Typography variant="subtitle1" color="text.secondary">
+            Message:
+          </Typography>
+          <Typography variant="body1" sx={{ wordBreak: 'break-word' }}>
+            {msgRequest?.messageItems[0].content}
+          </Typography>
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => { setOpen(false) }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleConfirmSend}
+            data-testid="confirm-send-btn"
+          >
+            Confirm Send
+          </Button>
+        </Box>
       </Box>
     </Modal>
   )

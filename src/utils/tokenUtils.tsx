@@ -36,11 +36,9 @@ export const getValidAccessToken = async (
 
       return tokenResponse.accessToken
     } else if (accessToken !== '') {
-      console.log('Using existing access token from state')
       return accessToken
     }
   } catch (error) {
-    console.log('Failed to refresh access token', error)
     dispatch(clearAuthState())
   }
 

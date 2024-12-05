@@ -16,6 +16,7 @@ import { getMsalInstance } from 'src/msalConfig'
 import { useDispatch } from 'react-redux'
 import { setAuthState } from 'src/features/auth/AuthApiSlice'
 import Loading from 'src/components/Loading'
+import Templates from 'src/pages/Messaging/Templates'
 import HistoryPage from 'src/pages/Messaging/History'
 
 const LoadingComponent = (): JSX.Element => (
@@ -94,7 +95,7 @@ function App (): JSX.Element {
             <Route path="/messaging" element={<MessagingLayout />} />
             <Route path="/messaging/quickmessage" element={<QuickMessage />} />
             <Route path="/messaging/campaign" element={<Placeholder title="Campaign" />} />
-            <Route path="/messaging/templates" element={<Placeholder title="Templates" />} />
+            <Route path="/messaging/templates" element={<Templates/>} />
             <Route path="/messaging/emailToSMS" element={<Placeholder title="Email to SMS" />} />
             <Route path="/messaging/history" element={<HistoryPage />} />
             <Route path="/contact-management" element={<ContactManagementLayout />} />

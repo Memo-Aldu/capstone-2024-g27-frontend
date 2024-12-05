@@ -54,7 +54,6 @@ const ContactForm: FC<ContactFormProps> = ({ onClose }) => {
       onClose()
     } catch (error) {
       notify('Error creating contact', 'error')
-      console.error(error)
     }
   }
 

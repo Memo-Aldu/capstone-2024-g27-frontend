@@ -38,10 +38,10 @@ const Conversation: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedContactName, setSelectedContactName] = useState<string | null>(null)
 
-  const { data: conversationsResponse, isLoading: isLoadingConversations } = useGetConversationsByParticipantQuery({ participantId: userId, page: 0, size: 10 })
+  const { data: conversationsResponse, isLoading: isLoadingConversations, refetch: refetchConversations } = useGetConversationsByParticipantQuery({ participantId: userId, page: 0, size: 10 })
   const { data: messagesResponse, isLoading: isLoadingMessages, refetch: refetchMessages } = useGetMessagesQuery({ userId, contactId: selectedContactId ?? '', page: 0, size: 10 }, { skip: selectedContactId == null })
   const [createConversation, { isLoading: isCreatingConversation }] = useCreateConversationMutation()
-  const { data: contactsResponse, isLoading: isLoadingContacts } = useGetAllContactsByUserIdQuery(userId)
+  const { data: contactsResponse, isLoading: isLoadingContacts, refetch: refetchContacts } = useGetAllContactsByUserIdQuery(userId)
   const [sendMessage] = useSendMessageMutation()
 
   const handleOpenModal = (): void => { setIsModalOpen(true) }
@@ -73,7 +73,6 @@ const Conversation: React.FC = () => {
         setIsModalOpen(false)
         notify('Conversation created successfully!', 'success')
       } catch (error: any) {
-        console.error('Error creating conversation:', error)
         if (error?.status === 409) {
           notify('Conversation already exists', 'warning')
         } else {
@@ -114,7 +113,6 @@ const Conversation: React.FC = () => {
         notify('Message sent successfully!', 'success')
         void refetchMessages()
       } catch (error) {
-        console.error('Error sending message:', error)
         notify('Error sending message', 'error')
       }
     }
@@ -131,12 +129,15 @@ const Conversation: React.FC = () => {
   }, [updateMessages])
 
   useEffect(() => {
-    const pollInterval = setInterval(() => {
+    const pollInterval = setInterval(async () => {
       if (selectedContactId != null) {
         void refetchMessages()
       }
+      const response = await refetchConversations().unwrap()
+      if (response?.data != null && response.data !== conversations) {
+        void refetchContacts()
+      }
     }, 2000)
-
     return () => { clearInterval(pollInterval) }
   }, [selectedContactId, refetchMessages])
 
