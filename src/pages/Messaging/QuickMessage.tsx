@@ -16,7 +16,7 @@ import {
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import MessagingLayout from '../../components/MessagingLayout'
 import { useSendMessageMutation } from 'src/features/message/MessageApiSlice'
 import { type MessageRequest, type MessageResponse } from 'src/types/Message.type'
@@ -27,13 +27,15 @@ import { type Contact } from 'src/types/Contact.type'
 import MsgConfirmationModal from 'src/components/MsgConfirmationModal'
 import { useDispatch, useSelector } from 'react-redux'
 import { showSnackbar } from 'src/features/snackbar/snackbarSlice'
-
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import type { RootState } from 'src/app/store'
 import { UploadZone } from 'src/components/UploadZone'
 import { ExpandMoreOutlined } from '@mui/icons-material'
 import { type Template } from 'src/types/Template.type.ts'
+import { useGetAllContactListsByUserIdQuery } from 'src/features/contact/ContactListApiSlice'
+import Loading from 'src/components/Loading'
+import type { BaseContactList } from 'src/types/ContactList.type'
 
 dayjs.extend(utc)
 
@@ -52,10 +54,9 @@ function QuickMessage (): JSX.Element {
       showSnackbar({ message, severity })
     )
   }
-
   const [sender, setSender] = useState('')
   const [to, setTo] = useState('')
-  const [recipients, setRecipients] = useState<Contact[]>([])
+  const [recipients, setRecipients] = useState<Array<Contact | BaseContactList>>([])
   const [messageContent, setMessageContent] = useState('')
   const [scheduledDate, setScheduledDate] = useState<Date | null>(null)
   const [errors, setErrors] = useState<FormErrors>({
@@ -69,8 +70,8 @@ function QuickMessage (): JSX.Element {
   )
 
   const [sendMessage] = useSendMessageMutation()
-  const { data: contacts } = useGetAllContactsQuery()
-
+  const { data: contacts, isLoading: isContactsLoading } = useGetAllContactsQuery()
+  const { data: groups = [], isLoading: isContactListLoading } = useGetAllContactListsByUserIdQuery(userId)
   const [uploadStatus, setUploadStatus] = useState('')
   const [files, setFiles] = useState<File[]>([])
 
@@ -81,7 +82,7 @@ function QuickMessage (): JSX.Element {
       messageError: ''
     }
     if (recipients.length === 0) {
-      newErrors.recipientError = 'At least one recipient is required'
+      newErrors.recipientError = 'At least one recipient (contact or group) is required'
     }
     if (sender === '') {
       newErrors.fromError = 'Sender cannot be empty'
@@ -93,18 +94,42 @@ function QuickMessage (): JSX.Element {
       newErrors.messageError = 'Message cannot be empty'
     }
 
-    recipients.forEach((recipient, index) => {
-      if (!validatePhoneNumber(recipient.phone)) {
-        newErrors.recipientError = `Invalid phone number for recipient ${index + 1}`
+    if (recipients.length === 0) {
+      newErrors.recipientError = 'At least one recipient (contact or group) is required'
+    }
+
+    const individualContacts = recipients.filter(
+      (recipient) => 'phone' in recipient
+    ) as Contact[]
+
+    const groupContacts = recipients
+      .filter((recipient) => 'listName' in recipient) // Only groups
+      .flatMap((group) => {
+        const groupId = (group as BaseContactList).id
+        if (contacts == null) return []
+        return contacts.filter((contact) => contact.contactListId === groupId)
+      })
+
+    // Deduplication logic
+    const allRecipients = [...individualContacts, ...groupContacts].filter(
+      (contact, index, self) =>
+        index === self.findIndex((c) => c?.id === contact?.id)
+    )
+
+    allRecipients.forEach((recipient, index) => {
+      if (recipient !== undefined && recipient.phone === '' && !validatePhoneNumber(recipient.phone)) {
+        newErrors.recipientError = `Recipient ${index + 1} has an invalid phone number`
       }
     })
+
+    console.log(allRecipients)
 
     setErrors(newErrors)
     if (Object.values(newErrors).every((error) => error === '')) {
       return {
         userId,
         from: sender,
-        messageItems: recipients.map((recipient) => ({
+        messageItems: allRecipients.map((recipient) => ({
           content: fillTemplatePlaceholders(messageContent, recipient),
           contactId: recipient.id,
           to: recipient.phone
@@ -225,10 +250,8 @@ function QuickMessage (): JSX.Element {
   }
 
   const fillTemplatePlaceholders = (template: string, recipient?: Contact): string => {
-    console.log('template', template)
     const replaceInTemplate = (template: string, obj: Record<string, string | number> | Contact): string => {
       for (const [key, value] of Object.entries(obj)) {
-        console.log(key, value)
         template = template.replace(`{{${key}}}`, String(value))
       }
       return template
@@ -252,6 +275,18 @@ function QuickMessage (): JSX.Element {
     return template
   }
 
+  if (isContactsLoading || isContactListLoading) {
+    return (
+      <Box sx={{
+        mb: 2,
+        textAlign: 'center',
+        width: 'calc(90vw - 200px)'
+      }}>
+        <Loading message={'Getting Contacts...'} description={'Please wait 😊'}/>
+      </Box>
+    )
+  }
+
   return (
     <MessagingLayout>
       <Typography variant="h4" component="h1" gutterBottom>
@@ -264,15 +299,18 @@ function QuickMessage (): JSX.Element {
         autoComplete="off"
         onSubmit={handleSubmit}
       >
-        <ContactAutoComplete
-          contacts={contacts}
-          recipients={recipients}
-          setRecipients={setRecipients}
-          recipientInput={to}
-          setRecipientInput={setTo}
-          errors={errors}
-          setErrors={setErrors}
-        />
+        <Box>
+          <ContactAutoComplete
+            contacts={contacts}
+            contactGroups={groups}
+            recipients={recipients}
+            setRecipients={setRecipients}
+            recipientInput={to}
+            setRecipientInput={setTo}
+            errors={errors}
+            setErrors={setErrors}
+          />
+        </Box>
         <Autocomplete
           disablePortal
           id="sender"
