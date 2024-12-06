@@ -59,6 +59,7 @@ const HistoryPage: React.FC = () => {
       case 'RECEIVED':
         return '#4CAF50'
       case 'FAILED':
+      case 'UNDELIVERED':
       case 'UNKNOWN':
         return '#F44336'
       default:
@@ -149,7 +150,7 @@ const HistoryPage: React.FC = () => {
                     <TableCell align="center">
                       {(message.price !== null && message.price !== 0.00 && message.currency !== null) ? `${message.currency} ${message.price.toFixed(2)}` : 'N/A' }
                     </TableCell>
-                    <TableCell align="center">{new Date(message.scheduledDate).toLocaleString() ?? 'N/A'}</TableCell>
+                    <TableCell align="center">{message.scheduledDate === null ? 'N/A' : new Date(message.scheduledDate).toLocaleString()}</TableCell>
                     <TableCell align="center">{new Date(message.createdDate).toLocaleString()}</TableCell>
                     <TableCell align="center">
                       {message.status === 'SCHEDULED' && (
