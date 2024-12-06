@@ -1,7 +1,11 @@
 # capstone-2024-frontend.
 
 ## Overview
-The **Pharmacy Messaging Service Frontend** is a modern, responsive web application built with **TypeScript** and **React**. This frontend interfaces with the Pharmacy Messaging Service backend, providing an intuitive UI for managing messages, conversations, and contacts. It serves as a key component for **DPR Group**, facilitating seamless communication for pharmacies and their customers.
+The Pharmacy Messaging Service Frontend is a modern web application built with TypeScript, React, and Material UI. It interfaces with the Pharmacy Messaging Service backend, providing an UI for managing messages, conversations, and contacts. It serves as a key component for DPR Group, facilitating seamless communication between pharmacies and their customers.
+
+## Test User Creds:
+user1@mimoaldujailigmail.onmicrosoft.com
+TestUserCrm102!
 
 ## Features
 - **User-Friendly Messaging Interface**:
@@ -35,7 +39,6 @@ Each layer is designed to ensure maintainability and extensibility.
 ---
 
 ## Requirements
-- **Node.js 18+**: Required for running the application.
 - **npm or Yarn**: For dependency management.
 - **Backend API**: Running instance of the Pharmacy Messaging Service backend.
 - **Environment Variables**: API base URL and other configurations.
@@ -46,8 +49,8 @@ Each layer is designed to ensure maintainability and extensibility.
 
 1. **Clone the Repository**:
    ```bash
-   git clone git@github.com:Memo-Aldu/capstone-2024-g27-pharmacy-messaging-frontend.git
-   cd capstone-2024-g27-pharmacy-messaging-frontend
+   git@github.com:Memo-Aldu/capstone-2024-g27-frontend.git
+   cd capstone-2024-g27-frontend
    ```
 
 2. **Set Up Environment Variables**:
@@ -79,7 +82,7 @@ Run all tests:
 npm test
 ```
 - **Coverage**:
-  - Comprehensive test coverage for components and API integrations.
+  -  Test coverage for components and API integrations.
 
 ---
 
@@ -91,8 +94,6 @@ npm test
   - Send and schedule messages.
 - **Contact Management**:
   - Add, edit, delete, and search contacts.
-- **Settings**:
-  - Configure user preferences and notifications.
 
 ### Authentication
 - OAuth2 Bearer Token authentication.
@@ -105,11 +106,22 @@ npm test
 ### Backend Integration
 - Configure the backend API URL in the `.env` file:
   ```
-  REACT_APP_API_BASE_URL=https://api.example.com
+  REACT_APP_CONTACT_MGMT_URL=https://some-name-id.eastus2.azurecontainerapps.io/api/v1/contacts
+  REACT_APP_CONVERSATION_MGMT_URL=https://some-name-id.eastus2.azurecontainerapps.io/api/v1/conversation
+  REACT_APP_SMS_MGMT_URL=https:///some-name-id.eastus2.azurecontainerapps.io/api/v1/messages
+  REACT_APP_CONTACTLIST_MGMT_URL=https:///some-name-id.eastus2.azurecontainerapps.io/api/v1/contact_lists
   ```
 
 ### Environment Variables
-- Define other variables like API keys or feature flags in `.env`.
+- Define other variables in `.env`.
+  ```
+  REACT_APP_TWILIO_NUMBER=+18732400000
+  
+  REACT_APP_AZURE_AD_CLIENT_ID=3b3b3b3b-3b3b-3b3b-3b3b-3b3b3b3b3b3b
+  REACT_APP_TENANT_ID=3b3b3b3b-3b3b-3b3b-3b3b-3b3b3b3b3b3b
+  REACT_APP_BACKEND_API_ID=3b3b3b3b-3b3b-3b3b-3b3b-3b3b3b3b3b3b
+  REACT_APP_REDIRECT_URI=http://localhost:3000/auth/callback
+  ```
 
 ---
 
