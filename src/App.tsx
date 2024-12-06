@@ -18,6 +18,7 @@ import { setAuthState } from 'src/features/auth/AuthApiSlice'
 import Loading from 'src/components/Loading'
 import Templates from 'src/pages/Messaging/Templates'
 import HistoryPage from 'src/pages/Messaging/History'
+import AuthCallback from 'src/pages/AuthCallback'
 
 const LoadingComponent = (): JSX.Element => (
   <Loading message={'Authenticating...'} description={'Please wait while we verify your credentials.'}/>
@@ -91,6 +92,7 @@ function App (): JSX.Element {
       >
         <Layout>
           <Routes>
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/dashboard" element={<Home />} />
             <Route path="/messaging" element={<MessagingLayout />} />
             <Route path="/messaging/quickmessage" element={<QuickMessage />} />
