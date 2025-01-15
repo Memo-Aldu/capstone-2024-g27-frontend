@@ -95,8 +95,6 @@ function App (): JSX.Element {
           -------------------------------------------------------
         */}
         <Route path="/" element={<LandingPage />} />
-        <Route path="/auth/callback" element={<AuthCallback />} />
-
         {/*
           -------------------------------------------------------
           2. Protected Routes
@@ -105,7 +103,7 @@ function App (): JSX.Element {
           -------------------------------------------------------
         */}
         <Route
-          path="/"
+          path="/app"
           element={
             <MsalAuthenticationTemplate
               interactionType={InteractionType.Redirect}
@@ -128,7 +126,7 @@ function App (): JSX.Element {
             require login, since they're children of the
             MsalAuthenticationTemplate.
           */ }
-
+          <Route path="auth/callback" element={<AuthCallback />} />
           <Route path="dashboard" element={<Home />} />
           <Route path="messaging" element={<MessagingLayout />} />
           <Route path="messaging/quickmessage" element={<QuickMessage />} />

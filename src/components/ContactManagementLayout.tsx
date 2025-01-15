@@ -14,8 +14,8 @@ function ContactManagementLayout (props: { children?: React.ReactNode }): JSX.El
   const drawerWidth = 200
   const menuItems = [
 
-    { name: 'Groups', path: '/ContactManagement/ContactGroup', icon: <GroupsIcon/> },
-    { name: 'Contacts', path: '/ContactManagement/Contacts', icon: < Contact/> }
+    { name: 'Groups', path: '/app/ContactManagement/ContactGroup', icon: <GroupsIcon/> },
+    { name: 'Contacts', path: '/app/ContactManagement/Contacts', icon: < Contact/> }
 
   ]
   return (

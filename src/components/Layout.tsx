@@ -39,16 +39,16 @@ export default function Layout (): JSX.Element {
 
   const handleAccountRedirect = (event: React.MouseEvent<HTMLElement>): void => {
     handleMenuClose()
-    navigate('/my-account')
+    navigate('/app/my-account')
   }
   const menuItems1 = [
-    { name: 'Dashboard', path: '/dashboard', icon: <Dashboard /> },
-    { name: 'Contact Management', path: '/contact-management', icon: <ContactMailIcon /> },
-    { name: 'Messaging', path: '/messaging', icon: <MessageIcon /> }
+    { name: 'Dashboard', path: '/app/dashboard', icon: <Dashboard /> },
+    { name: 'Contact Management', path: '/app/contact-management', icon: <ContactMailIcon /> },
+    { name: 'Messaging', path: '/app/messaging', icon: <MessageIcon /> }
   ]
   const menuItems2 = [
-    { name: 'Help', path: '/help', icon: <HelpIcon /> },
-    { name: 'My Account', path: '/my-account', icon: <AccountCircleIcon /> }
+    { name: 'Help', path: '/app/help', icon: <HelpIcon /> },
+    { name: 'My Account', path: '/app/my-account', icon: <AccountCircleIcon /> }
   ]
 
   return (

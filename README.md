@@ -120,7 +120,7 @@ npm test
   REACT_APP_AZURE_AD_CLIENT_ID=3b3b3b3b-3b3b-3b3b-3b3b-3b3b3b3b3b3b
   REACT_APP_TENANT_ID=3b3b3b3b-3b3b-3b3b-3b3b-3b3b3b3b3b3b
   REACT_APP_BACKEND_API_ID=3b3b3b3b-3b3b-3b3b-3b3b-3b3b3b3b3b3b
-  REACT_APP_REDIRECT_URI=http://localhost:3000/auth/callback
+  REACT_APP_REDIRECT_URI=http://localhost:3000/app/auth/callback
   ```
 
 ---
