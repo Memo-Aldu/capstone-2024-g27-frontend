@@ -1,7 +1,7 @@
 # capstone-2024-frontend.
 
 ## Overview
-The Pharmacy Messaging Service Frontend is a modern web application built with TypeScript, React, and Material UI. It interfaces with the Pharmacy Messaging Service backend, providing an UI for managing messages, conversations, and contacts. It serves as a key component for DPR Group, facilitating seamless communication between pharmacies and their customers.
+The RelayCom Messaging Service Frontend is a modern web application built with TypeScript, React, and Material UI. It interfaces with the Messaging Service backend, providing an UI for managing messages, conversations, and contacts. It serves as a key component for client and their customers.
 
 ## Test User Creds:
 user1@mimoaldujailigmail.onmicrosoft.com
@@ -40,7 +40,7 @@ Each layer is designed to ensure maintainability and extensibility.
 
 ## Requirements
 - **npm or Yarn**: For dependency management.
-- **Backend API**: Running instance of the Pharmacy Messaging Service backend.
+- **Backend API**: Running instance of the Messaging Service backend.
 - **Environment Variables**: API base URL and other configurations.
 
 ---
@@ -120,7 +120,7 @@ npm test
   REACT_APP_AZURE_AD_CLIENT_ID=3b3b3b3b-3b3b-3b3b-3b3b-3b3b3b3b3b3b
   REACT_APP_TENANT_ID=3b3b3b3b-3b3b-3b3b-3b3b-3b3b3b3b3b3b
   REACT_APP_BACKEND_API_ID=3b3b3b3b-3b3b-3b3b-3b3b-3b3b3b3b3b3b
-  REACT_APP_REDIRECT_URI=http://localhost:3000/auth/callback
+  REACT_APP_REDIRECT_URI=http://localhost:3000/app/auth/callback
   ```
 
 ---

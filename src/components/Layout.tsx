@@ -15,7 +15,7 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
-import { useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { IconButton, MenuItem, MenuList, Tooltip } from '@mui/material'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import SettingsIcon from '@mui/icons-material/Settings'
@@ -24,7 +24,7 @@ import Logout from 'src/components/Logout'
 
 const drawerWidth = 300
 
-export default function Layout (props: { children: React.ReactNode }): JSX.Element {
+export default function Layout (): JSX.Element {
   const navigate = useNavigate()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
@@ -39,16 +39,16 @@ export default function Layout (props: { children: React.ReactNode }): JSX.Eleme
 
   const handleAccountRedirect = (event: React.MouseEvent<HTMLElement>): void => {
     handleMenuClose()
-    navigate('/my-account')
+    navigate('/app/my-account')
   }
   const menuItems1 = [
-    { name: 'Dashboard', path: '/dashboard', icon: <Dashboard /> },
-    { name: 'Contact Management', path: '/contact-management', icon: <ContactMailIcon /> },
-    { name: 'Messaging', path: '/messaging', icon: <MessageIcon /> }
+    { name: 'Dashboard', path: '/app/dashboard', icon: <Dashboard /> },
+    { name: 'Contact Management', path: '/app/contact-management', icon: <ContactMailIcon /> },
+    { name: 'Messaging', path: '/app/messaging', icon: <MessageIcon /> }
   ]
   const menuItems2 = [
-    { name: 'Help', path: '/help', icon: <HelpIcon /> },
-    { name: 'My Account', path: '/my-account', icon: <AccountCircleIcon /> }
+    { name: 'Help', path: '/app/help', icon: <HelpIcon /> },
+    { name: 'My Account', path: '/app/my-account', icon: <AccountCircleIcon /> }
   ]
 
   return (
@@ -63,7 +63,7 @@ export default function Layout (props: { children: React.ReactNode }): JSX.Eleme
     >
       <Toolbar sx={{ justifyContent: 'space-between' }}>
         <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 'bold' }}>
-          PharmfinderCRM
+          RelayComs
         </Typography>
         {/* Right Icons */}
         <Box>
@@ -155,7 +155,7 @@ export default function Layout (props: { children: React.ReactNode }): JSX.Eleme
       </Drawer>
       <Box component="main">
         <Toolbar />
-        {props.children}
+        <Outlet />
       </Box>
     </Box>
   )
