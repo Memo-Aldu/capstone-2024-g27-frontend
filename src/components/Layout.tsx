@@ -63,7 +63,7 @@ export default function Layout (): JSX.Element {
     >
       <Toolbar sx={{ justifyContent: 'space-between' }}>
         <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 'bold' }}>
-          PharmfinderCRM
+          RelayComs
         </Typography>
         {/* Right Icons */}
         <Box>
