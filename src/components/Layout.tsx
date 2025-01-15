@@ -15,7 +15,7 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
-import { useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { IconButton, MenuItem, MenuList, Tooltip } from '@mui/material'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import SettingsIcon from '@mui/icons-material/Settings'
@@ -24,7 +24,7 @@ import Logout from 'src/components/Logout'
 
 const drawerWidth = 300
 
-export default function Layout (props: { children: React.ReactNode }): JSX.Element {
+export default function Layout (): JSX.Element {
   const navigate = useNavigate()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
@@ -155,7 +155,7 @@ export default function Layout (props: { children: React.ReactNode }): JSX.Eleme
       </Drawer>
       <Box component="main">
         <Toolbar />
-        {props.children}
+        <Outlet />
       </Box>
     </Box>
   )
