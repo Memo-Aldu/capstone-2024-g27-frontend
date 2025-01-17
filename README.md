@@ -3,10 +3,6 @@
 ## Overview
 The RelayCom Messaging Service Frontend is a modern web application built with TypeScript, React, and Material UI. It interfaces with the Messaging Service backend, providing an UI for managing messages, conversations, and contacts. It serves as a key component for client and their customers.
 
-## Test User Creds:
-user1@mimoaldujailigmail.onmicrosoft.com
-TestUserCrm102!
-
 ## Features
 - **User-Friendly Messaging Interface**:
   - Send and schedule messages (SMS/MMS).
